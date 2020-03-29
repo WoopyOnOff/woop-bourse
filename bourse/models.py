@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
@@ -31,11 +31,16 @@ class Event(models.Model):
 class UserList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    list_status = models.IntegerField('List Status',default=1)
+    LIST_STATUSES = (
+        (1,'Editable'),
+        (2,'Validated'),
+        (3,'Archived'),
+    )
+    list_status = models.IntegerField('List Status',default=1,choices=LIST_STATUSES)
     created_date = models.DateTimeField('Date Created', auto_now_add=True)
-    validated_date = models.DateTimeField('Date Validated')
+    validated_date = models.DateTimeField('Date Validated',blank=True,null=True)
     def __str__(self):
-        return self.user + ' ' + self.event + ' ' + self.list_status
+        return self.user.username + ' - ' + self.event.event_name + ' - ' + self.event.event_date.strftime('%d/%m/%y') + ' - ' + str(self.list_status)
     def status_desc(self):
         if self.status==1:
             return 'Editable'
@@ -50,7 +55,7 @@ class Item(models.Model):
     price = models.IntegerField('Sold Price')
     created_date = models.DateTimeField('Date Created', auto_now_add=True)
     is_sold = models.BooleanField('Item Sold',default=False)
-    sold_date = models.DateTimeField('Date Sold')
+    sold_date = models.DateTimeField('Date Sold',blank=True,null=True)
     def __str__(self):
         return self.name
 
@@ -59,10 +64,10 @@ class Order(models.Model):
     created_date = models.DateTimeField('Date Created', auto_now_add=True)
     is_validated = models.BooleanField('Order Validated',default=False)
     def __str__(self):
-        return self.event + ' ' + self.created_date + ' ' + self.is_validated
+        return self.event.event_name + ' ' + self.created_date.strftime('%d/%m/%y %H:%M:%S')
 
 class OrderItem(models.Model):
     order = models.ForeignKey(Order, on_delete=models.CASCADE)
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     def __str__(self):
-        return self.order + ' ' + self.item
+        return str(self.order.id) + ' ' + self.item.name

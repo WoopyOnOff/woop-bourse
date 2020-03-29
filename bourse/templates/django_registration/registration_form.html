@@ -1,7 +1,15 @@
-{% load bootstrap4 %}
-
-{% bootstrap_css %}
-
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {% load bootstrap4 %}
+    {% bootstrap_css %}
+    {% bootstrap_javascript jquery='full' %}
+    <meta charset="utf-8">
+    <title>Bourses aux jeux Woopy On Off</title>
+</head>
+<body>
+<h1>Création d'un compte pour utiliser les fonctionnalités du site.</h1>
+<p>La création d'un compte est obligatoire pour pouvoir utiliser le site.</p>
 <form action="." method="post" class="form">
     {% csrf_token %}
     {% bootstrap_form form %}
@@ -9,3 +17,4 @@
         <button type="submit" class="btn btn-primary">Submit</button>
     {% endbuttons %}
 </form>
+</body>

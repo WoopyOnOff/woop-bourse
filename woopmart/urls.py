@@ -14,10 +14,14 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.views.generic import RedirectView
 from django.urls import include,path
 from django.contrib.auth import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
+    path('',RedirectView.as_view(url='bourse/',permanent=True)), # Redirection vers bourse/
     path('admin/', admin.site.urls),
     path('bourse/', include('bourse.urls')),
     path('accounts/', include('django_registration.backends.activation.urls')),
@@ -25,3 +29,8 @@ urlpatterns = [
     # path('accounts/login', views.LoginView.as_view(), name='login'),
     # path('accounts/logout/', views.LogoutView.as_view(), name='logout'),
 ]
+
+# Use static() to add url mapping to serve static files during development (only)
+#urlpatterns += [
+#    static(settings.STATIC_URL, document_root=settings.STATIC_ROOT),
+#]
