@@ -1,0 +1,8 @@
+Bonjour {{user}},
+
+Merci d'activer votre compte en suivant le lien suivant :
+{{scheme}}://{{site}}/accounts/activate/{{activation_key}}
+Attention ce lien expirera dans {{expiration_days}} jours.
+
+Cordialement.
+L'équipe Woopy On Off
