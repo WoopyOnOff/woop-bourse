@@ -2,6 +2,7 @@ from datetime import datetime
 from django.utils import timezone
 from django.db import models
 from django.contrib.auth.models import User
+from django.urls import reverse
 
 # Create your models here.
 class Event(models.Model):
@@ -18,15 +19,15 @@ class Event(models.Model):
     comments = models.TextField(max_length=2000)
     def __str__(self):
         return self.event_name
+    def get_absolute_url(self):
+        return reverse('event-detail', args=[str(self.id)])
+    def date_only(self):
+        return self.event_date.strftime('%d/%m/%Y')
+    def hour_only(self):
+        return self.event_date.strftime('%Hh%M')
     def status_desc(self):
-        if self.status==1:
-            return 'Saisie Ouverte'
-        elif self.status==2:
-            return 'Saisie Fermée'
-        elif self.status==3:
-            return 'Bourse Ouverte'
-        elif self.status==4:
-            return 'Bourse Fermée'
+        val = self.STATUSES[1][self.status]
+        return val
 
 class UserList(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
@@ -40,14 +41,10 @@ class UserList(models.Model):
     created_date = models.DateTimeField('Date Created', auto_now_add=True)
     validated_date = models.DateTimeField('Date Validated',blank=True,null=True)
     def __str__(self):
-        return self.user.username + ' - ' + self.event.event_name + ' - ' + self.event.event_date.strftime('%d/%m/%y') + ' - ' + str(self.list_status)
+        return self.user.username + ' - ' + self.event.event_name + ' - ' + self.event.date_only + ' - ' + str(self.list_status)
     def status_desc(self):
-        if self.status==1:
-            return 'Editable'
-        elif self.status==2:
-            return 'Validated'
-        elif self.status==3:
-            return 'Archived'
+        val = self.STATUSES[1][self.status]
+        return val
 
 class Item(models.Model):
     list = models.ForeignKey(UserList, on_delete=models.CASCADE)

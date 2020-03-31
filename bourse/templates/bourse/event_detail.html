@@ -1,0 +1,18 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h1>Événement : {{ event.event_name }} du {{ event.event_date }}</h1>
+<p>{{ event.location }}</p>
+<p>{{ event.comments }}</p>
+
+<div style="margin-left:20px;margin-top:20px">
+    <h4>État :</h4>
+    {% if event.status == 1 %}
+        <p>- Bourse Ouverte aux inscriptions - <a href="">Participer !</a></p>
+    {% else %}
+        <p>Bourse Fermée.</p>
+    {% endif %}
+</div>
+
+{% endblock %}

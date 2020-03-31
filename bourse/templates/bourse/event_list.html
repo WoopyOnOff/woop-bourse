@@ -1,0 +1,16 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h1>Liste des événements</h1>
+  {% if event_list %}
+  <ul>
+    {% for event in event_list %}
+      <li>
+        <a href="{{ event.get_absolute_url }}">{{ event.event_name }} du {{ event.date_only }}</a> ({{event.status_desc}})
+      </li>
+    {% endfor %}
+  </ul>
+  {% else %}
+    <p>Aucun événement listé.</p>
+  {% endif %}       
+{% endblock %}

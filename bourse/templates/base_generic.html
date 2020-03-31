@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  {% block title %}<title>Bourses aux Jeux Woopy On Off</title>{% endblock %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  {% load bootstrap4 %}
+  {% bootstrap_css %}
+  {% bootstrap_javascript jquery='full' %}
+  <!-- Add additional CSS in static file -->
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+</head>
+<body>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="col-sm-2">
+      {% block sidebar %}
+        <ul class="sidebar-nav">
+          <li><a href="{% url 'index' %}">Accueil</a></li>
+          <li><a href="{% url 'events' %}">Les événements</a></li>
+          <li><a href="/accounts/register">S'inscrire</a></li>
+          <li><a href="/accounts/login">Se connecter</a></li>
+        </ul>
+      {% endblock %}
+      </div>
+      <div class="col-sm-10 ">{% block content %}{% endblock %}</div>
+    </div>
+  </div>
+</body>
+</html>
