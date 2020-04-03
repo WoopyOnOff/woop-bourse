@@ -2,7 +2,7 @@
 
 {% block content %}
 
-<h1>Événement : {{ event.event_name }} du {{ event.event_date }}</h1>
+<h1>{{ event.event_name }} du {{ event.date_only }}</h1>
 <p>{{ event.location }}</p>
 <p>{{ event.comments }}</p>
 

@@ -22,7 +22,7 @@ class Event(models.Model):
     def get_absolute_url(self):
         return reverse('event-detail', args=[str(self.id)])
     def date_only(self):
-        return self.event_date.strftime('%d/%m/%Y')
+        return self.event_date.strftime('%d %B %Y')
     def hour_only(self):
         return self.event_date.strftime('%Hh%M')
     def status_desc(self):

@@ -3,29 +3,83 @@
 <head>
   {% block title %}<title>Bourses aux Jeux Woopy On Off</title>{% endblock %}
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="theme-color" content="#563d7c">
   {% load bootstrap4 %}
   {% bootstrap_css %}
   {% bootstrap_javascript jquery='full' %}
   <!-- Add additional CSS in static file -->
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <style>
+    .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+      }
+    }
+  </style>
 </head>
-<body>
-  <div class="container-fluid">
-    <div class="row">
-      <div class="col-sm-2">
-      {% block sidebar %}
-        <ul class="sidebar-nav">
-          <li><a href="{% url 'index' %}">Accueil</a></li>
-          <li><a href="{% url 'events' %}">Les événements</a></li>
-          <li><a href="/accounts/register">S'inscrire</a></li>
-          <li><a href="/accounts/login">Se connecter</a></li>
-        </ul>
-      {% endblock %}
-      </div>
-      <div class="col-sm-10 ">{% block content %}{% endblock %}</div>
+<body class="d-flex flex-column h-100">
+<header>
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="{% url 'index' %}">Woopy On Off</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse order-1 order-md-0 dual-collapse2" id="navbarCollapse" >
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item active">
+          <a class="nav-link" href="{% url 'index' %}">Accueil <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'events' %}">Les événements</a>
+        </li>
+      </ul>
     </div>
+
+    <div class="collapse navbar-collapse order-3 dual-collapse2" id="navbarCollapse2" >
+      <ul class="navbar-nav ml-auto">
+      {% if not user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="/accounts/register">S'inscrire</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'login'%}?next={{request.path}}">Se connecter</a>
+        </li>
+        {% else %}
+        <li class="nav-item">
+          <a class="nav-link" href="/accounts/profile">Mon compte ({{ user.get_username }})</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'logout'%}">Se déconnecter</a>
+        </li>
+      {% endif %}
+      </ul> 
+    </div>
+  </nav>
+</header>
+
+<!-- Begin page content -->
+<main role="main" class="flex-shrink-0">
+  <div class="container">
+    {% block content %}{% endblock %}
   </div>
+</main>
+
+<footer class="footer fixed-bottom py-3">
+  <div class="container">
+    <span class="text-muted">Bourses aux jeux - Woopy On Off - 2020</span>
+  </div>
+</footer>
 </body>
 </html>
