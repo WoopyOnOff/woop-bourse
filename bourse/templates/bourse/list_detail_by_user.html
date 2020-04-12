@@ -1,0 +1,33 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<h2>Ma liste {{ userlist.list_label }}</h2>
+<table class="table">
+    <thread>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">Libellé</th>
+            <th scope="col">Prix de vente</th>
+            <th scope="col">Est vendu ?</th>
+            <th scope="col">Date vente</th>
+            {% if userlist.is_editable and userlist.event_status == 1 %}
+            <th scope="col">Action</th>
+            {% endif %}
+        </tr>
+    </thread>
+    <tbody>
+        {% for item in userlist.item_set.all %}
+        <tr>
+            <th scope="row">{{item.pk}}</th>
+            <td>{{item.name}}</td>
+            <td>{{item.price}}</td>
+            <td>{% if item.is_sold %}<img src="/static/img/icon-no.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
+            <td>{% if item.is_sold %}{{item.sold_date}}{% else %}-{% endif %}</td>
+            {% if userlist.is_editable and userlist.event_status == 1 %}
+            <td><a href="{% url 'edit-item-from-list' userlist.pk item.pk %}">Éditer</a> / <a href="{% url 'del-item-from-list' userlist.pk item.pk %}">Supprimer</a></td>
+            {% endif %}
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% if userlist.is_editable and userlist.event_status == 1 %}<a href="{% url 'add-item-to-list' userlist.pk %}">Ajouter un jeu.</a>{% endif %}
+{% endblock %}

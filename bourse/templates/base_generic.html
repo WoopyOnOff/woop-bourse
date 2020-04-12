@@ -11,6 +11,9 @@
   <!-- Add additional CSS in static file -->
   {% load static %}
   <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon-180x180.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
   <style>
     .bd-placeholder-img {
       font-size: 1.125rem;
@@ -44,6 +47,11 @@
         <li class="nav-item">
           <a class="nav-link" href="{% url 'events' %}">Les événements</a>
         </li>
+        {% if user.is_authenticated %}
+        <li class="nav-item">
+          <a class="nav-link" href="{% url 'my-lists' %}">Mes listes</a>
+        </li>
+        {% endif %}
       </ul>
     </div>
 

@@ -1,0 +1,15 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<h2>Mes listes</h2>
+    {% if userlist_list %}
+    <ul>
+        {% for list in userlist_list %}
+        <li>
+            {{list.list_label}} ({{list.event_status_desc}}) <a href="{% url 'my-list-view' list.pk %}">{% if list.is_editable and list.event_status == 1 %} Éditer{% else %}Visualiser{% endif %}</a>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+        <p>Vous n'avez actuellement aucune liste.</p>
+    {% endif %}
+{% endblock %}
