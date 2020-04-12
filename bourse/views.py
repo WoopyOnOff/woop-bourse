@@ -3,12 +3,8 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidde
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.utils import timezone
-from django.template import loader
-from django.contrib.auth import authenticate, login
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
-from django.db import transaction
 from django.utils.translation import ugettext_lazy as _
 
 # Create your views here.
@@ -80,6 +76,6 @@ class ItemDelete(LoginRequiredMixin,DeleteView):
 
 @login_required
 def user_list_create_or_view(request, event_id, user_id):
-    event_inst = get_object_or_404(Event,id=event_id)
+    event_inst = get_object_or_404(Event,id=event_id,status=1)
     user_list, created = UserList.objects.get_or_create(event=event_inst,user=request.user)
     return redirect('my-lists')
