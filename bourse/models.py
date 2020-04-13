@@ -61,6 +61,9 @@ class Item(models.Model):
     sold_date = models.DateTimeField('Date Sold',blank=True,null=True)
     def __str__(self):
         return self.name
+    def code(self):
+        item_code = str(self.pk) + ' - ' + self.name
+        return item_code
 
 class Order(models.Model):
     # Modele des bons de vente

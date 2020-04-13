@@ -22,6 +22,7 @@ class UserListAdmin(admin.ModelAdmin):
 
 class OrderItemInline(admin.TabularInline):
     model = OrderItem
+    #fields = [('code')]
 
 @admin.register(Order)
 class OrderAdmin(admin.ModelAdmin):

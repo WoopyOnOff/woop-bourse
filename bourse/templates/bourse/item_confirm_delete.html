@@ -2,13 +2,13 @@
 
 {% block content %}
 
-<h2>Suppression de jeu</h2>
-
-<p>Êtes-vous sur de vouloir supprimer le jeu : {{ item.name }}?</p>
+<h2>Suppression du jeu</h2>
 
 <form action="" method="POST">
   {% csrf_token %}
-  <input type="submit" value="Oui, supprimer.">
+  <p>Êtes-vous sur de vouloir supprimer le jeu : {{ item.name }} ?</p>
+  <input type="submit" value="Oui, supprimer." />
+  <input type="submit" name="cancel" value="Non, annuler." />
 </form>
 
 {% endblock %}

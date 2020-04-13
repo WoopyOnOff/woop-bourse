@@ -62,14 +62,14 @@
           <a class="nav-link" href="/accounts/register">S'inscrire</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'login'%}?next={{request.path}}">Se connecter</a>
+          <a class="nav-link" href="{% url 'login' %}?next={{request.path}}">Se connecter</a>
         </li>
         {% else %}
         <li class="nav-item">
-          <a class="nav-link" href="/accounts/profile">Mon compte ({{ user.get_username }})</a>
+          <a class="nav-link" href="{% url 'profile-edit' user.pk %}">Mon compte ({{ user.get_username }})</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="{% url 'logout'%}">Se déconnecter</a>
+          <a class="nav-link" href="{% url 'logout' %}">Se déconnecter</a>
         </li>
       {% endif %}
       </ul> 

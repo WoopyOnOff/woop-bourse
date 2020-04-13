@@ -18,3 +18,9 @@ class ItemForm(forms.ModelForm):
         fields = ['name','price']
 
 #ItemFormSet = inlineformset_factory(UserList,Item,form=ItemForm,fields=('name','price',),extra=1,can_delete=True)
+
+class ListValidateForm(forms.Form):
+    description_text = _('Êtes-vous certain de vouloir valider votre formulaire ? Cette action est irréversible.')
+    class Meta:
+        model = UserList
+        fields = None
