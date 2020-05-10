@@ -2,10 +2,9 @@
 {% block content %}
 <h2>Ma liste</h2>
 <h3>{{ userlist.list_label }}</h3>
-<table class="table">
-    <thread>
+<table class="table table-striped">
+    <thead class="thead-dark">
         <tr>
-            <th scope="col">#</th>
             <th scope="col">Libellé</th>
             <th scope="col">Prix de vente</th>
             <th scope="col">Jeu vendu ?</th>
@@ -14,11 +13,10 @@
             <th scope="col">Action</th>
             {% endif %}
         </tr>
-    </thread>
+    </thead>
     <tbody>
         {% for item in userlist.item_set.all %}
         <tr>
-            <th scope="row">{{item.pk}}</th>
             <td>{{item.name}}</td>
             <td>{{item.price}}</td>
             <td>{% if item.is_sold %}<img src="/static/img/icon-no.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>

@@ -1,0 +1,3 @@
+django-bootstrap4
+django-registration
+django-crispy-forms

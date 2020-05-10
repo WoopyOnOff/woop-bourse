@@ -1,0 +1,34 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+{% if event_inst %}
+    {% for event in event_inst %}
+    <h2>{{ event.event_name }} du {{ event.date_only }}</h2>
+    <h4>Statut : {{ event.status_desc }} (<a href="#">Modifier</a>)</h4>
+    <table class="table">
+        <thread><tr><th scope="col">#</th><th scope="col">État</th></tr></thread>
+        <tr><td colspan="2">Listes : <a href="{% url 'admin-lists-manage' event.id %}">Visualiser</a></td></tr>
+        <tr><td>{{ user_lists_editable }}</td><td>listes en cours d'édition.</td></tr>
+        <tr><td>{{ user_lists_validated }}</td><td>listes validées par les utilisateurs.</td></tr>
+        <tr><td>{{ user_lists_adminvalidated }}</td><td>listes validées par l'admin.</td></tr>
+        <tr><td>{{ user_lists_total }}</td><td>listes en tout.</td></tr>
+        <tr><td colspan="2">Jeux :</td></tr>
+        <tr><td>{{ item_total }}</td><td>jeux en tout.</td></tr>
+        <tr><td>{{ item_sold_total }}</td><td>jeux vendus.</td></tr>
+        <tr><td colspan="2">Commandes : 
+            {% if event.status >= 3 %}
+            <a href="{% url 'admin-order-create' event.pk %}" >Visualiser</a>
+            {% elif event.status == 3 %}
+            <a href="{% url 'admin-order-create' event.pk %}" >Créer</a>
+            {% endif %}
+            </td>
+        </tr>
+        <tr><td>{{ order_total }}</td><td>ventes totales.</td></tr>
+        <tr><td>{{ order_unvalidated }}</td><td>ventes non validées.</td></tr>
+    </table>
+    {% endfor %}
+{% endif %}
+
+
+{% endblock %}

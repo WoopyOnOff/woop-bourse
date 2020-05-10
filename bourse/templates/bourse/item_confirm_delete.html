@@ -7,8 +7,8 @@
 <form action="" method="POST">
   {% csrf_token %}
   <p>Êtes-vous sur de vouloir supprimer le jeu : {{ item.name }} ?</p>
-  <input type="submit" value="Oui, supprimer." />
-  <input type="submit" name="cancel" value="Non, annuler." />
+  <button type="submit" class="btn btn-primary">Oui, supprimer.</button>
+  <button type="submit" name="cancel" class="btn btn-primary">Non, annuler.</button>
 </form>
 
 {% endblock %}

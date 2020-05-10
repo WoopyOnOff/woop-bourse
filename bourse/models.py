@@ -60,7 +60,7 @@ class Item(models.Model):
     is_sold = models.BooleanField('Item Sold',default=False)
     sold_date = models.DateTimeField('Date Sold',blank=True,null=True)
     def __str__(self):
-        return self.name
+        return str(self.pk) + ' - ' + self.name
     def code(self):
         item_code = str(self.pk) + ' - ' + self.name
         return item_code

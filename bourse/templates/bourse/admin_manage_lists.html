@@ -1,0 +1,43 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<h2>Les listes des utilisateurs</h2>
+<table class="table table-striped">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">Nom</th>
+      <th scope="col">Prénom</th>
+      <th scope="col">Nom d'utilisateur</th>
+      <th scope="col">Status liste</th>
+      <th scope="col">Validée le :</th>
+      <th scope="col">Document PDF :</th>
+    </tr>
+  </thead>
+  <tbody>
+  {% for list in user_lists %}
+    {% if list.list_status == 1 %}
+    <tr class="bg-danger">
+    {% elif list.list_status == 3 %}
+    <tr class="bg-success">
+    {% else %}
+    <tr>
+    {% endif %}
+      <td>{{ list.user.last_name }}</td>
+      <td>{{ list.user.first_name }}</td>
+      <td>{{ list.user.username }}</td>
+      <td>
+        {{ list.status_desc }} 
+        {% if list.list_status == 2 %} (<a href="{% url 'admin-list-validate' list.event.pk list.pk %}">Valider</a>)
+        {% elif list.list_status == 3 %} (<a href="{% url 'admin-list-validate' list.event.pk list.pk %}">Invalider</a>)
+        {% endif %}
+      </td>
+      <td>{{ list.validated_date }}</td>
+      <td>
+        {% if list.list_status == 3 %} <a href="#">PDF</a>
+        {% endif %}
+      </td>
+    </tr>
+  {% endfor %}
+  </tbody>
+</table>
+<a href="{% url 'admin-dashboard' event_id %}">Retour Dashboard</a>
+{% endblock %}
