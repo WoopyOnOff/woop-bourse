@@ -71,7 +71,7 @@ class Order(models.Model):
     created_date = models.DateTimeField('Date Created', auto_now_add=True)
     is_validated = models.BooleanField('Order Validated',default=False)
     def __str__(self):
-        return self.event.event_name + ' ' + self.created_date.strftime('%d/%m/%y %H:%M:%S')
+        return self.event.event_name + ' - ' + str(self.pk) + ' - ' + self.created_date.strftime('%d/%m/%y %H:%M:%S')
 
 class OrderItem(models.Model):
     # Modele des elements (jeux) des bons de vente

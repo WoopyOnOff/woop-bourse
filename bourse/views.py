@@ -246,3 +246,11 @@ class OrderCreate(PermissionRequiredMixin,CreateView):
 #         'orderform': orderform,
 #         'formset': formset,
 #     })
+
+# Visualisation des commandes de la bourse
+class OrdersListView(LoginRequiredMixin,generic.ListView):
+    model = Order
+    template_name = 'bourse/admin_orders_list.html'
+    paginate_by = 5
+    def get_queryset(self):
+        return Order.objects.filter(event=self.kwargs.get('event_id')).order_by('-created_date')

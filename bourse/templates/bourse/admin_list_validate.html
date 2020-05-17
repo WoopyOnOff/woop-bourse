@@ -2,7 +2,8 @@
 {% load crispy_forms_tags %}
 
 {% block content %}
-<h2>Liste de {{ user_list.user }} {{ user_list.user.last_name }} ({{ user_list.user.username }})</h2>
+<h2>Liste de {{ user_list.user.first_name }} {{ user_list.user.last_name }} ({{ user_list.user.username }})</h2>
+<h4>ID : {{ user_list.pk }}</h4>
 
 <table class="table table-striped">
     <thead class="thead-dark">
@@ -19,7 +20,7 @@
             <th scope="row">{{item.pk}}</th>
             <td>{{ item.name }}</td>
             <td>{{ item.price }}</td>
-            <td>{% if item.is_sold %}<img src="/static/img/icon-no.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
+            <td>{% if item.is_sold %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
         </tr>
     {% endfor %}
     </tbody>
