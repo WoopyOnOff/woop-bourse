@@ -12,6 +12,7 @@
         <th scope="col">Nom du jeu</th>
         <th scope="col">Tarif</th>
         <th scope="col">Jeu vendu ?</th>
+        <th scope="col">Date vente</th>
       </tr>
     </thead>
     <tbody>
@@ -21,8 +22,12 @@
             <td>{{ item.name }}</td>
             <td>{{ item.price }}</td>
             <td>{% if item.is_sold %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
+            <td>{{ item.sold_date }}</td>
         </tr>
     {% endfor %}
+        <tr><td colspan="2">Total vente :</td><td>{{total_sold}}</td><td></td><td></td></tr>
+        <tr><td colspan="3">Nb jeux vendus :</td><td>{{number_sold}}</td><td></td></tr>
+        <tr><td colspan="3">Total hors commission :</td><td>{{total_sold_minus_com}}</td><td></td></tr>
     </tbody>
 </table>
 

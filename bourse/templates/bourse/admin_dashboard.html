@@ -16,12 +16,10 @@
         <tr><td colspan="2">Jeux :</td></tr>
         <tr><td>{{ item_total }}</td><td>jeux en tout.</td></tr>
         <tr><td>{{ item_sold_total }}</td><td>jeux vendus.</td></tr>
+        <tr><td>{{ item_sold_price_total }}</td><td>€ de ventes.</td></tr>
         <tr><td colspan="2">Commandes : 
-            {% if event.status >= 3 %}
-            <a href="{% url 'admin-order-create' event.pk %}" >Visualiser</a>
-            {% elif event.status == 3 %}
-            <a href="{% url 'admin-order-create' event.pk %}" >Créer</a>
-            {% endif %}
+            {% if event.status == 3 %}<a href="{% url 'admin-order-create' event.pk %}" >Créer</a> {% endif %}
+            {% if event.status >= 3 %}<a href="{% url 'admin-order-create' event.pk %}" >Visualiser</a> {% endif %}
             </td>
         </tr>
         <tr><td>{{ order_total }}</td><td>ventes totales.</td></tr>

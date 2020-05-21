@@ -26,7 +26,7 @@ SECRET_KEY = '<yourSecretKey>'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    '<yourIP>,
+    '<yourIP>',
 ]
 
 
@@ -60,7 +60,9 @@ ROOT_URLCONF = 'woopmart.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [
+            os.path.join(BASE_DIR, 'templates'),
+        ],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,6 +130,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
 
 STATIC_URL = '/static/'
+# STATIC_ROOT = os.path.join(BASE_DIR, "static/") # for production
 
 # django-registration settings
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window
@@ -138,5 +141,9 @@ EMAIL_PORT = '<yourPort>'
 EMAIL_HOST_USER = '<YourUser>'
 EMAIL_HOST_PASSWORD = '<YourPassword>'
 EMAIL_USE_TLS = True
+
 # CRISPY_FORMS_CONF
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# APP SPECIAL CONF
+COMMISSION = 1

@@ -6,6 +6,8 @@ from django.views.generic.edit import CreateView, UpdateView, DeleteView
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
+from django.db.models import Sum
 import datetime
 
 # Create your views here.
@@ -61,6 +63,11 @@ class ListDetailByUserDetailView(LoginRequiredMixin,generic.DetailView):
     template_name = 'bourse/list_detail_by_user.html'
     def get_queryset(self):
         return UserList.objects.filter(user=self.request.user).order_by('created_date')
+    def get_context_data(self, **kwargs):
+       context = super().get_context_data(**kwargs)
+       context['nb_sold'] = Item.objects.filter(list=self.object,is_sold=True).count()
+       context['total_vente'] = sum( int(item.price) - settings.COMMISSION for item in Item.objects.filter(list=self.object,is_sold=True))
+       return context
 
 # Validation de la liste par l'utilisateur
 @login_required
@@ -142,7 +149,9 @@ def Dashboard(request,event_id):
         user_lists_editable = UserList.objects.filter(event=event_id,list_status=1).count()
         user_lists_adminvalidated = UserList.objects.filter(event=event_id,list_status=3).count()
         item_total = Item.objects.filter(list__event=event_id).count()
-        item_sold_total = Item.objects.filter(list__event=event_id,is_sold=True).count()
+        item_sold = Item.objects.filter(list__event=event_id,is_sold=True)
+        item_sold_total = item_sold.count()
+        item_sold_price_total = sum( int(item.price) for item in item_sold )
         order_total = Order.objects.filter(event=event_id).count()
         order_unvalidated = Order.objects.filter(event=event_id,is_validated=False).count()
         context = {
@@ -153,6 +162,7 @@ def Dashboard(request,event_id):
             'user_lists_adminvalidated':user_lists_adminvalidated,
             'item_total':item_total,
             'item_sold_total':item_sold_total,
+            'item_sold_price_total':item_sold_price_total,
             'order_total':order_total,
             'order_unvalidated':order_unvalidated
         }
@@ -179,6 +189,9 @@ def ListDetailValidate(request,event_id,list_id):
     template_name = 'bourse/admin_list_validate.html'
     user_list = get_object_or_404(UserList,pk=list_id,event=event_id)
     user_list_items = Item.objects.filter(list=list_id)
+    user_list_number_sold = user_list_items.filter(is_sold=True).count()
+    user_list_total_sold = sum( int(item.price) for item in user_list_items.filter(is_sold=True) )
+    user_list_total_sold_minus_com = sum( int(item.price) - settings.COMMISSION for item in user_list_items.filter(is_sold=True) )
     success_url = redirect('admin-lists-manage',event_id)
     if request.user.is_staff == 1:
         if request.method == 'POST':
@@ -197,7 +210,10 @@ def ListDetailValidate(request,event_id,list_id):
             context = { 
                 'form':form,
                 'user_list':user_list,
-                'user_list_items':user_list_items}
+                'user_list_items':user_list_items,
+                'total_sold':user_list_total_sold,
+                'number_sold':user_list_number_sold,
+                'total_sold_minus_com':user_list_total_sold_minus_com}
             return render(request,template_name,context)
     else:
         return HttpResponseForbidden()
