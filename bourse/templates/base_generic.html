@@ -33,48 +33,7 @@
 </head>
 <body class="d-flex flex-column h-100">
 <header>
-  <!-- Fixed navbar -->
-  <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
-    <a class="navbar-brand" href="{% url 'index' %}">Woopy On Off</a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse order-1 order-md-0 dual-collapse2" id="navbarCollapse" >
-      <ul class="navbar-nav mr-auto">
-        <li class="nav-item active">
-          <a class="nav-link" href="{% url 'index' %}">Accueil <span class="sr-only">(current)</span></a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'events' %}">Les événements</a>
-        </li>
-        {% if user.is_authenticated %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'my-lists' %}">Mes listes</a>
-        </li>
-        {% endif %}
-      </ul>
-    </div>
-
-    <div class="collapse navbar-collapse order-3 dual-collapse2" id="navbarCollapse2" >
-      <ul class="navbar-nav ml-auto">
-      {% if not user.is_authenticated %}
-        <li class="nav-item">
-          <a class="nav-link" href="/accounts/register">S'inscrire</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'login' %}?next={% url 'index' %}">Se connecter</a>
-        </li>
-        {% else %}
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'profile-edit' user.pk %}">Mon compte ({{ user.get_username }})</a>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link" href="{% url 'logout' %}">Se déconnecter</a>
-        </li>
-      {% endif %}
-      </ul> 
-    </div>
-  </nav>
+  {% include 'navbar.html' %}
 </header>
 
 <!-- Begin page content -->
