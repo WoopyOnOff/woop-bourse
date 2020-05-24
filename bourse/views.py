@@ -30,7 +30,7 @@ class ProfileUpdate(LoginRequiredMixin,UpdateView):
     def get_queryset(self):
         return User.objects.filter(pk=self.request.user.id)
     def get_success_url(self):
-        return redirect('profile-edit', kwargs={'pk':self.object.pk})
+        return reverse('profile-edit',kwargs={'pk':self.object.pk})
 
 ### Vues Événements ###
 
