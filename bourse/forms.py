@@ -3,7 +3,13 @@ from django.forms.models import inlineformset_factory, BaseInlineFormSet, modelf
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
+from django.contrib.auth.models import User
 from .models import Item, UserList, Order, OrderItem
+
+class UserForm(forms.ModelForm):
+    class Meta:
+        model = User
+        fields = ['first_name','last_name','email']
 
 class ItemForm(forms.ModelForm):
     name = forms.CharField(label='Nom du jeu')

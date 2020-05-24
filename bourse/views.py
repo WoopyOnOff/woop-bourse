@@ -13,7 +13,7 @@ import datetime
 # Create your views here.
 from .models import Event, UserList, Item, Order, OrderItem
 from django.contrib.auth.models import User
-from .forms import ItemForm, ListValidateForm, OrderModelForm, OrderItemFormset, ListManageForm
+from .forms import UserForm, ItemForm, ListValidateForm, OrderModelForm, OrderItemFormset, ListManageForm
 
 ### Index ###
 def index(request):
@@ -26,7 +26,8 @@ def index(request):
 ### Profil Utilisateur ###
 class ProfileUpdate(LoginRequiredMixin,UpdateView):
     model = User
-    fields = ['first_name','last_name','email']
+    form_class = UserForm
+    template_name = 'bourse/profile_edit.html'
     def get_queryset(self):
         return User.objects.filter(pk=self.request.user.id)
     def get_success_url(self):
