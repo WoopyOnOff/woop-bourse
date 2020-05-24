@@ -30,7 +30,7 @@ class ProfileUpdate(LoginRequiredMixin,UpdateView):
     def get_queryset(self):
         return User.objects.filter(pk=self.request.user.id)
     def get_success_url(self):
-        return reverse_lazy('profile-edit', kwargs={'pk':self.object.pk})
+        return redirect('profile-edit', kwargs={'pk':self.object.pk})
 
 ### Vues Événements ###
 
@@ -219,49 +219,56 @@ def ListDetailValidate(request,event_id,list_id):
         return HttpResponseForbidden()
 
 # WIP
-class OrderCreate(PermissionRequiredMixin,CreateView):
-    permission_required = 'order.can_add'
-    model = Order
-    fields = ['is_validated']
-    def get_context_data(self, **kwargs):
-        data = super().get_context_data(**kwargs)
-        if self.request.POST:
-            data["orderitem"] = OrderItemFormset(self.request.POST)
-        else:
-            data["orderitem"] = OrderItemFormset()
-        return data
-    def form_valid(self, form):
-        context = self.get_context_data()
-        orderitem = context["orderitem"]
-        self.object = form.save()
-        if orderitem.is_valid():
-            orderitem.instance = self.object
-            orderitem.save()
-        return super().form_valid(form)
-    def get_success_url(self):
-        return reverse("admin-dashboard", 1)
+# class OrderCreate(PermissionRequiredMixin,CreateView):
+#     permission_required = 'order.can_add'
+#     model = Order
+#     fields = ['is_validated']
+#     def get_context_data(self, **kwargs):
+#         data = super().get_context_data(**kwargs)
+#         if self.request.POST:
+#             data["orderitem"] = OrderItemFormset(self.request.POST)
+#         else:
+#             data["orderitem"] = OrderItemFormset()
+#         return data
+#     def form_valid(self, form):
+#         context = self.get_context_data()
+#         orderitem = context["orderitem"]
+#         self.object = form.save()
+#         if orderitem.is_valid():
+#             orderitem.instance = self.object
+#             orderitem.save()
+#         return super().form_valid(form)
+#     def get_success_url(self):
+#         return reverse("admin-dashboard", 1)
 
-# def create_order_with_items(request, event_id):
-#     template_name = 'bourse/create_with_item.html'
-#     if request.method == 'GET':
-#         orderform = OrderModelForm(request.GET or None)
-#         formset = OrderItemFormset(queryset=OrderItem.objects.none())
-#     elif request.method == 'POST':
-#         orderform = OrderModelForm(request.POST)
-#         formset = OrderItemFormset(request.POST)
-#         if orderform.is_valid() and formset.is_valid():
-#             # first save this order, as its reference will be used in `Author`
-#             order = orderform.save()
-#             for form in formset:
-#                 # so that `order` instance can be attached.
-#                 orderitem = form.save(commit=False)
-#                 orderitem.order = order
-#                 orderitem.save()
-#             return redirect('dashboard', 1)
-#     return render(request, template_name, {
-#         'orderform': orderform,
-#         'formset': formset,
-#     })
+def create_order_with_items(request, event_id):
+    event = get_object_or_404(Event,pk=event_id)
+    template_name = 'bourse/create_with_item.html'
+    if request.method == 'GET':
+        orderform = OrderModelForm(request.GET or None)
+        formset = OrderItemFormset(queryset=OrderItem.objects.none())
+    elif request.method == 'POST':
+        orderform = OrderModelForm(request.POST)
+        formset = OrderItemFormset(request.POST)
+        if orderform.is_valid() and formset.is_valid():
+            # first save this order, as its reference will be used in `OrderItem`
+            order = orderform.save(commit=False)
+            order.event = event
+            order = orderform.save()
+            for form in formset:
+                # so that `order` instance can be attached.
+                orderitem = form.save(commit=False)
+                orderitem.order = order
+                orderitem.item = orderitem.item
+                orderitem.item.is_sold = True
+                orderitem.item.sold_date = datetime.datetime.now()
+                orderitem.item.save()
+                orderitem.save()
+            return redirect('admin-dashboard', event_id)
+    return render(request, template_name, {
+        'orderform': orderform,
+        'formset': formset,
+    })
 
 # Visualisation des commandes de la bourse
 class OrdersListView(LoginRequiredMixin,generic.ListView):

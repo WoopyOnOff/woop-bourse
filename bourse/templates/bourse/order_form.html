@@ -20,7 +20,7 @@
               </div>
           </div>
       </div>
-  </div>
+    </div>
   {% endfor %}
     <!-- {{ orderitem|crispy }} -->
     <button type="submit" class="btn btn-primary">Enregistrer</button>
@@ -75,12 +75,12 @@
     }
     $(document).on('click', '.add-form-row', function(e){
         e.preventDefault();
-        cloneMore('.form-row:last', 'form');
+        cloneMore('.form-row:last', 'itemform');
         return false;
     });
     $(document).on('click', '.remove-form-row', function(e){
         e.preventDefault();
-        deleteForm('form', $(this));
+        deleteForm('itemform', $(this));
         return false;
     });
     </script>

@@ -23,10 +23,11 @@ urlpatterns = [
     ### Administration
     #path('admin/',views.AdminIndex,name='admin-index'),
     path('admin/<int:event_id>/dashboard',views.Dashboard,name='admin-dashboard'),
-    path('admin/<int:event_id>/order/create',views.OrderCreate.as_view(),name='admin-order-create'),
     path('admin/<int:event_id>/managelists',views.Managelists,name='admin-lists-manage'),
     path('admin/<int:event_id>/list/<int:list_id>/validate',views.ListDetailValidate,name='admin-list-validate'),
     path('admin/<int:event_id>/orders',views.OrdersListView.as_view(),name='admin-orders'),
-    ##path('admin/<int:event_id>/order/create',views.create_order_with_items,name='order-create'),
+    #path('admin/<int:event_id>/order/<int:order_id>/edit/',views.OrdersListView.as_view(),name='admin-orders'),
+    #path('admin/<int:event_id>/order/create',views.OrderCreate.as_view(),name='admin-order-create'),
+    path('admin/<int:event_id>/order/create',views.create_order_with_items,name='admin-order-create'),
     #path('admin/<int:event_id>/order/update',views.Dashboard,name='dashboard'),
 ]

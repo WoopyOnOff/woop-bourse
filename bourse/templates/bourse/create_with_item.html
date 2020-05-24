@@ -1,19 +1,9 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-
+<h2>Création d'un bon de vente.</h2>
 <form class="form-horizontal" method="POST" action="">
-    {% csrf_token %}
-<div class="row spacer">
-<div class="col-2">
-    <label>Bon de vente</label>
-</div>
-<div class="col-4">
-    <div class="input-group">
-        {{orderform.is_validated}}
-    </div>
-</div>
-</div>
+{% csrf_token %}
 {{ formset.management_form }}
 {% for form in formset %}
 <div class="row form-row spacer">
@@ -29,6 +19,16 @@
         </div>
     </div>
 </div>
+<div class="row spacer">
+    <div class="col-2">
+        <label>Valider le bon :</label>
+    </div>
+    <div class="col-4">
+        <div class="input-group">
+            {{orderform.is_validated}}
+        </div>
+    </div>
+</div>
 {% endfor %}
 <div class="row spacer">
     <div class="col-4 offset-2">
@@ -36,22 +36,27 @@
     </div>
 </div>
 </form>
+{% endblock %}
 
-<script type='text/javascript'>
+{% block custom_js %}
+<script type="text/javascript">
     function updateElementIndex(el, prefix, ndx) {
         var id_regex = new RegExp('(' + prefix + '-\\d+)');
         var replacement = prefix + '-' + ndx;
         if ($(el).attr("for")) $(el).attr("for", $(el).attr("for").replace(id_regex, replacement));
         if (el.id) el.id = el.id.replace(id_regex, replacement);
-        if (el.item) el.item = el.item.replace(id_regex, replacement);
+        if (el.name) el.name = el.name.replace(id_regex, replacement);
     }
     function cloneMore(selector, prefix) {
         var newElement = $(selector).clone(true);
         var total = $('#id_' + prefix + '-TOTAL_FORMS').val();
         newElement.find(':input:not([type=button]):not([type=submit]):not([type=reset])').each(function() {
-            var item = $(this).attr('item').replace('-' + (total-1) + '-', '-' + total + '-');
-            var id = 'id_' + item;
-            $(this).attr({'item': item, 'id': id}).val('').removeAttr('checked');
+            var name = $(this).attr('name')
+            if(name) {
+                name = name.replace('-' + (total-1) + '-', '-' + total + '-');
+                var id = 'id_' + name;
+                $(this).attr({'name': name, 'id': id}).val('').removeAttr('checked');
+            }
         });
         newElement.find('label').each(function() {
             var forValue = $(this).attr('for');
@@ -67,7 +72,7 @@
         conditionRow.find('.btn.add-form-row')
         .removeClass('btn-success').addClass('btn-danger')
         .removeClass('add-form-row').addClass('remove-form-row')
-        .html('<span class="glyphicon glyphicon-minus" aria-hidden="true"></span>');
+        .html('-');
         return false;
     }
     function deleteForm(prefix, btn) {
@@ -94,6 +99,6 @@
         deleteForm('form', $(this));
         return false;
     });
-    </script>
-
+    
+</script>
 {% endblock %}
