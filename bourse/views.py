@@ -3,7 +3,7 @@ from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidde
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -13,9 +13,11 @@ import datetime
 # Create your views here.
 from .models import Event, UserList, Item, Order, OrderItem
 from django.contrib.auth.models import User
-from .forms import UserForm, ItemForm, ListValidateForm, OrderModelForm, OrderItemFormset, ListManageForm
+from .forms import UserForm, ItemForm, ListValidateForm, EventForm, OrderModelForm, OrderItemFormset, ItemTextForm, ListManageForm
 
+#############
 ### Index ###
+#############
 def index(request):
     opened_registration_event = Event.objects.filter(status=1)
     context = {
@@ -23,7 +25,9 @@ def index(request):
     }
     return render(request, 'index.html', context=context)
 
+##########################
 ### Profil Utilisateur ###
+##########################
 class ProfileUpdate(LoginRequiredMixin,UpdateView):
     model = User
     form_class = UserForm
@@ -33,7 +37,9 @@ class ProfileUpdate(LoginRequiredMixin,UpdateView):
     def get_success_url(self):
         return reverse('profile-edit',kwargs={'pk':self.object.pk})
 
+#######################
 ### Vues Événements ###
+#######################
 
 class EventListView(generic.ListView):
     model = Event
@@ -41,11 +47,13 @@ class EventListView(generic.ListView):
 class EventDetailView(generic.DetailView):
     model = Event
 
+###########################
 ### Vues sur les listes ###
+###########################
 
 # Création d'une liste si elle n'existe pas pour l'utilisateur
 @login_required
-def user_list_create_or_view(request, event_id, user_id):
+def user_list_create_or_view(request, event_id):
     event_inst = get_object_or_404(Event,id=event_id,status=1)
     user_list, created = UserList.objects.get_or_create(event=event_inst,user=request.user)
     return redirect('my-lists')
@@ -56,7 +64,7 @@ class ListsByUserListView(LoginRequiredMixin,generic.ListView):
     template_name = 'bourse/lists_by_user.html'
     paginate_by = 5
     def get_queryset(self):
-        return UserList.objects.filter(user=self.request.user).order_by('created_date')
+        return UserList.objects.filter(user=self.request.user).order_by('-created_date')
 
 # Detail liste de l'utilisateur
 class ListDetailByUserDetailView(LoginRequiredMixin,generic.DetailView):
@@ -66,14 +74,15 @@ class ListDetailByUserDetailView(LoginRequiredMixin,generic.DetailView):
         return UserList.objects.filter(user=self.request.user).order_by('created_date')
     def get_context_data(self, **kwargs):
        context = super().get_context_data(**kwargs)
-       context['nb_sold'] = Item.objects.filter(list=self.object,is_sold=True).count()
-       context['total_vente'] = sum( int(item.price) - settings.COMMISSION for item in Item.objects.filter(list=self.object,is_sold=True))
+       user_list_items = Item.objects.filter(list=self.object,is_sold=True)
+       context['nb_sold'] = user_list_items.count()
+       context['total_vente'] = sum( int(item.price) - settings.COMMISSION for item in user_list_items)
        return context
 
-# Validation de la liste par l'utilisateur
+# Validation de la liste par l'utilisateur (liste de status editable / Bourse en saisie ouverte)
 @login_required
 def ListValidate(request,pk):
-    list_instance = get_object_or_404(UserList,pk=pk,user=request.user)
+    list_instance = get_object_or_404(UserList,pk=pk,user=request.user,list_status=1,event__status=1)
     success_url = redirect('my-list-view',list_instance.pk)
     if request.method == 'POST':
         if "cancel" in request.POST:
@@ -90,19 +99,21 @@ def ListValidate(request,pk):
     context = { 'form': form, 'list_instance': list_instance,}
     return render(request,'bourse/userlist_validate.html',context)
 
+######################################
 ### Vues sur les éléments de liste ###
+######################################
 
 # Ajout d'un jeu à la liste de l'utilisateur
 class ItemCreate(LoginRequiredMixin,CreateView):
     model = Item
     form_class = ItemForm
     def get_queryset(self):
-        return Item.objects.filter(list__user=self.request.user,list__list_status=1,list=self.kwargs.get('list_id'),list__event__status=1)
+        return Item.objects.filter(list=self.kwargs.get('list_id'),list__user=self.request.user,list__list_status=1,list__event__status=1)
     def form_valid(self, form):
         form.instance.list__user = self.request.user
         self.object = form.save(commit=False)
         self.object.list_id = self.kwargs.get('list_id', None)
-        if UserList.objects.filter(user=self.request.user,id=self.object.list_id,event__status=1):
+        if UserList.objects.filter(user=self.request.user,id=self.object.list_id,list_status=1,event__status=1):
             self.object.save()
             return redirect('my-list-view',self.object.list_id)
         else:
@@ -113,12 +124,12 @@ class ItemUpdate(LoginRequiredMixin,UpdateView):
     model = Item
     form_class = ItemForm
     def get_queryset(self):
-        return Item.objects.filter(list__user=self.request.user,list__list_status=1,id=self.kwargs.get('pk'),list__event__status=1)
+        return Item.objects.filter(id=self.kwargs.get('pk'),list__user=self.request.user,list__list_status=1,list__event__status=1)
     def form_valid(self, form):
         form.instance.list__user = self.request.user
         self.object = form.save(commit=False)
         self.object.list_id = self.kwargs.get('list_id', None)
-        if UserList.objects.filter(user=self.request.user,id=self.object.list_id,event__status=1):
+        if UserList.objects.filter(user=self.request.user,id=self.object.list_id,list_status=1,event__status=1):
             self.object.save()
             return redirect('my-list-view',self.object.list_id)
         else:
@@ -128,7 +139,7 @@ class ItemUpdate(LoginRequiredMixin,UpdateView):
 class ItemDelete(LoginRequiredMixin,DeleteView):
     model = Item
     def get_queryset(self):
-        return Item.objects.filter(list__user=self.request.user,list__list_status=1,id=self.kwargs.get('pk'),list__event__status=1)
+        return Item.objects.filter(id=self.kwargs.get('pk'),list__user=self.request.user,list__list_status=1,list__event__status=1)
     def get_success_url(self):
         return reverse_lazy('my-list-view',kwargs={'pk':self.kwargs.get('list_id','')})
     def post(self, request, *args, **kwargs):
@@ -138,7 +149,9 @@ class ItemDelete(LoginRequiredMixin,DeleteView):
         else:
             return super(ItemDelete, self).post(request, *args, **kwargs)
 
+######################
 ### Administration ###
+######################
 
 # Dashboard pour la bourse
 @login_required
@@ -171,18 +184,29 @@ def Dashboard(request,event_id):
     else:
         return HttpResponseForbidden()
 
+# Mise à jour du status d'un événement
+class EventUpdate(UserPassesTestMixin,UpdateView):
+    model = Event
+    form_class = EventForm
+    def test_func(self):
+        return self.request.user.is_staff
+    def get_queryset(self):
+        return Event.objects.filter(id=self.kwargs.get('pk'))
+    def form_valid(self, form):
+        if self.request.user.is_staff == 1:
+            self.object.save()
+            return redirect('admin-dashboard',self.kwargs.get('pk'))
+        else:
+            return HttpResponseForbidden()
+
 # Visualisation des listes des utilisateurs
-@login_required
-def Managelists(request,event_id):
-    if request.user.is_staff == 1:
-        user_lists = UserList.objects.filter(event=event_id)
-        context = {
-            'user_lists':user_lists,
-            'event_id':event_id,
-        }
-        return render(request,'bourse/admin_manage_lists.html',context=context)
-    else:
-        return HttpResponseForbidden()
+class ListsListView(UserPassesTestMixin,generic.ListView):
+    model = UserList
+    template_name = 'bourse/admin_manage_lists.html'
+    def test_func(self):
+        return self.request.user.is_staff
+    def get_queryset(self):
+        return UserList.objects.filter(event=self.kwargs.get('pk')).order_by('validated_date')
 
 # Visu et changement de status d'une liste
 @login_required
@@ -219,62 +243,93 @@ def ListDetailValidate(request,event_id,list_id):
     else:
         return HttpResponseForbidden()
 
-# WIP
-# class OrderCreate(PermissionRequiredMixin,CreateView):
-#     permission_required = 'order.can_add'
-#     model = Order
-#     fields = ['is_validated']
-#     def get_context_data(self, **kwargs):
-#         data = super().get_context_data(**kwargs)
-#         if self.request.POST:
-#             data["orderitem"] = OrderItemFormset(self.request.POST)
-#         else:
-#             data["orderitem"] = OrderItemFormset()
-#         return data
-#     def form_valid(self, form):
-#         context = self.get_context_data()
-#         orderitem = context["orderitem"]
-#         self.object = form.save()
-#         if orderitem.is_valid():
-#             orderitem.instance = self.object
-#             orderitem.save()
-#         return super().form_valid(form)
-#     def get_success_url(self):
-#         return reverse("admin-dashboard", 1)
+#################
+### Commandes ###
+#################
 
-def create_order_with_items(request, event_id):
-    event = get_object_or_404(Event,pk=event_id)
-    template_name = 'bourse/create_with_item.html'
-    if request.method == 'GET':
-        orderform = OrderModelForm(request.GET or None)
-        formset = OrderItemFormset(queryset=OrderItem.objects.none())
-    elif request.method == 'POST':
-        orderform = OrderModelForm(request.POST)
-        formset = OrderItemFormset(request.POST)
-        if orderform.is_valid() and formset.is_valid():
-            # first save this order, as its reference will be used in `OrderItem`
-            order = orderform.save(commit=False)
-            order.event = event
-            order = orderform.save()
-            for form in formset:
-                # so that `order` instance can be attached.
-                orderitem = form.save(commit=False)
-                orderitem.order = order
-                orderitem.item = orderitem.item
-                orderitem.item.is_sold = True
-                orderitem.item.sold_date = datetime.datetime.now()
-                orderitem.item.save()
-                orderitem.save()
-            return redirect('admin-dashboard', event_id)
-    return render(request, template_name, {
-        'orderform': orderform,
-        'formset': formset,
-    })
+# Création de commande vide
+@login_required
+def order_create(request, event_id):
+    if request.user.is_staff == 1:
+        event_inst = get_object_or_404(Event,id=event_id,status=3)
+        order = Order.objects.create(event=event_inst)
+        return redirect('admin-ordermanage', event_id, order.pk)
+    else:
+        return HttpResponseForbidden()
+
+# Détail commande avec formulaire d'ajout de jeu
+@login_required
+def OrderDetailValidate(request,event_id,order_id):
+    template_name = 'bourse/admin_order_detail.html'
+    order = get_object_or_404(Order,pk=order_id,event=event_id)
+    order_items = OrderItem.objects.filter(order=order_id)
+    order_total = sum( int(item.item.price) for item in order_items )
+    success_url = redirect('admin-orders',event_id)
+    if request.user.is_staff == 1:
+        if request.method == 'POST':
+            if "cancel" in request.POST:
+                return success_url
+            elif "add_item" in request.POST:
+                form_item = ItemTextForm(request.POST)
+                if form_item.is_valid():
+                    order_item_pk = form_item.clean_item_pk()
+                    if Item.objects.filter(list__event=event_id,pk=order_item_pk,is_sold=False).exists():
+                        item = Item.objects.filter(list__event=event_id).get(pk=order_item_pk)
+                        OrderItem.objects.create(order=order,item=item)
+                    return HttpResponseRedirect("")
+                else:
+                    return HttpResponseRedirect("")
+            else:
+                form = OrderModelForm(request.POST)
+                if form.is_valid():
+                    order.is_validated = form.cleaned_data['is_validated']
+                    for order_item in order_items:
+                        if order.is_validated: # modifier les item de la commande is_sold et date sold
+                            order_item.item.is_sold = True
+                            order_item.item.sold_date = datetime.datetime.now()
+                            order_item.item.save()
+                        else: # nettoyer le is_sold et date_sold
+                            order_item.item.is_sold = False
+                            order_item.item.sold_date = None
+                            order_item.item.save()
+                    order.save()
+                    return success_url
+        else:
+            form = OrderModelForm(initial={'is_validated':order.is_validated})
+            form_item = ItemTextForm()
+            context = { 
+                'form':form,
+                'form_item':form_item,
+                'order':order,
+                'event_id':event_id,
+                'order_items':order_items,
+                'order_total':order_total,}
+            return render(request,template_name,context)
+    else:
+        return HttpResponseForbidden()
+
+# Supression d'un item de la commande en cours
+class OrderItemDelete(UserPassesTestMixin,DeleteView):
+    model = OrderItem
+    def test_func(self):
+        return self.request.user.is_staff
+    def get_queryset(self):
+        return OrderItem.objects.filter(id=self.kwargs.get('pk'),order__is_validated=False,order__event__status=3)
+    def get_success_url(self):
+        return reverse_lazy('admin-ordermanage',kwargs={'event_id':self.kwargs.get('event_id',''),'order_id':self.kwargs.get('order_id','')})
+    def post(self, request, *args, **kwargs):
+        if "cancel" in request.POST:
+            url = self.get_success_url()
+            return HttpResponseRedirect(url)
+        else:
+            return super(OrderItemDelete, self).post(request, *args, **kwargs)
 
 # Visualisation des commandes de la bourse
-class OrdersListView(LoginRequiredMixin,generic.ListView):
+class OrdersListView(UserPassesTestMixin,generic.ListView):
     model = Order
     template_name = 'bourse/admin_orders_list.html'
     paginate_by = 5
+    def test_func(self):
+        return self.request.user.is_staff
     def get_queryset(self):
         return Order.objects.filter(event=self.kwargs.get('event_id')).order_by('-created_date')

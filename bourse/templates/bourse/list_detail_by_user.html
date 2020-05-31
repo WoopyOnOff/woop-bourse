@@ -1,7 +1,15 @@
 {% extends "base_generic.html" %}
 {% block content %}
+
 <h2>Ma liste</h2>
 <h3>{{ userlist.list_label }}</h3>
+{% if userlist.is_editable and userlist.event_status == 1 %}
+<div class="row spacer"><div class="col-3 ">
+    <a href="{% url 'add-item-to-list' userlist.pk %}"><button class="btn btn-block btn-primary">Ajouter un jeu.</button></a>
+</div></div>
+<p></p>
+{% endif %}
+
 <table class="table table-striped">
     <thead class="thead-dark">
         <tr>
@@ -15,7 +23,7 @@
         </tr>
     </thead>
     <tbody>
-        {% for item in userlist.item_set.all %}
+        {% for item in userlist.item_set_sorted %}
         <tr>
             <td>{{item.name}}</td>
             <td>{{item.price}}</td>
@@ -32,11 +40,14 @@
         {% endif %}
     </tbody>
 </table>
+
 {% if userlist.is_editable and userlist.event_status == 1 %}
-    <p><a href="{% url 'add-item-to-list' userlist.pk %}">Ajouter un jeu.</a></p>
-    <p><a href="{% url 'validate-list' userlist.pk %}">Valider ma liste.</a></br>
-    Une fois prêt, validez votre liste, vous ne pourrez alors plus l'éditer.</p>
+<p>Une fois prêt, validez votre liste, vous ne pourrez alors plus l'éditer.</p>
+<div class="row spacer"><div class="col-3 ">
+    <a href="{% url 'validate-list' userlist.pk %}"><button class="btn btn-block btn-primary">Valider ma liste.</button></a>
+</div></div>
 {% else %}
     <p>Cette liste ne peut plus être modifiée.</p>
 {% endif %}
+
 {% endblock %}

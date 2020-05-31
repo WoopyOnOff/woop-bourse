@@ -2,13 +2,24 @@
 {% block content %}
 <h2>Mes listes</h2>
     {% if userlist_list %}
-    <ul>
-        {% for list in userlist_list %}
-        <li>
-            {{list.list_label}} ({{list.event_status_desc}}) <a href="{% url 'my-list-view' list.pk %}">{% if list.is_editable and list.event_status == 1 %} Éditer{% else %}Visualiser{% endif %}</a>
-        </li>
-        {% endfor %}
-    </ul>
+    <table class="table table-striped">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">Nom de l'événement</th>
+            <th scope="col">Statut</th>
+            <th scope="col">Lien</th>
+          </tr>
+        </thead>
+        <tbody>
+            {% for list in userlist_list %}
+            <tr>
+                <td>{{list.list_label}}</td>
+                <td>{{list.event_status_desc}}</td>
+                <td><a href="{% url 'my-list-view' list.pk %}">{% if list.is_editable and list.event_status == 1 %} Éditer{% else %}Visualiser{% endif %}</a></td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
     {% else %}
         <p>Vous n'avez actuellement aucune liste.</p>
     {% endif %}

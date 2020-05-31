@@ -4,7 +4,7 @@ from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
 
 from django.contrib.auth.models import User
-from .models import Item, UserList, Order, OrderItem
+from .models import Item, UserList, Event, Order, OrderItem
 
 class UserForm(forms.ModelForm):
     class Meta:
@@ -33,12 +33,28 @@ class ListValidateForm(forms.Form):
 ############################
 # Adminitration
 ############################
+class EventForm(forms.ModelForm):
+    class Meta:
+        model = Event
+        fields = ('status',)
+
 class OrderModelForm(forms.ModelForm):
     class Meta:
         model = Order
         fields = ('is_validated',)
 
 OrderItemFormset = modelformset_factory(OrderItem,fields=('item',),extra=1)
+
+class ItemTextForm(forms.Form):
+    item_pk = forms.IntegerField(label='Code du jeu',help_text=_('Entrer le code du jeu à ajouter.'))
+    def __init__(self, *args, **kwargs):
+        event_id = kwargs.pop('event_id', None)
+        super(ItemTextForm, self).__init__(*args, **kwargs)
+    def clean_item_pk(self):
+        data = self.cleaned_data['item_pk']
+        if not Item.objects.filter(pk=data,is_sold=False).exists() or OrderItem.objects.filter(item=data):
+            raise ValidationError(_('Jeu non trouvé, ou déjà vendu.'), code='invalid')
+        return data
 # Orders
 #OrderItemFormset = inlineformset_factory(Order, OrderItem, fields=('item',),extra=1,widgets={'item:':forms.TextInput(attrs={'class': 'form-control','placeholder':'Entrer le code du jeu'})})
 

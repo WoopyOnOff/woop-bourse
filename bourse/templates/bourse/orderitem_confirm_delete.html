@@ -1,0 +1,14 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<h2>Suppression d'un élément</h2>
+
+<form action="" method="POST">
+  {% csrf_token %}
+  <p>Êtes-vous sur de vouloir supprimer l'élément : {{ orderitem.item }} ?</p>
+  <button type="submit" class="btn btn-primary">Oui, supprimer.</button>
+  <button type="submit" name="cancel" class="btn btn-primary">Non, annuler.</button>
+</form>
+
+{% endblock %}

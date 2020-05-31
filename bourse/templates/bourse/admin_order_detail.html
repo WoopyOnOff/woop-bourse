@@ -1,0 +1,48 @@
+{% extends "base_generic.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h2>Commande</h2>
+<h4>ID : {{ order.pk }} - Date de création : {{ order.created_date }}</h4>
+
+{% if not order.is_validated %}
+<div class="col-6">
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form_item|crispy }}
+    <button type="submit" name="add_item" class="btn btn-primary">Ajouter le jeu.</button>
+</form>
+<p></p>
+</div>
+{% endif %}
+
+<table class="table table-striped">
+    <thead class="thead-dark">
+      <tr>
+        <th scope="col">#</th>
+        <th scope="col">Nom du jeu</th>
+        <th scope="col">Tarif</th>
+        <th scope="col"></th>
+      </tr>
+    </thead>
+    <tbody>
+    {% for item in order_items %}
+        <tr>
+            <th scope="row">{{item.item.pk}}</th>
+            <td>{{ item.item.name }}</td>
+            <td>{{ item.item.price }}</td>
+            <td>{% if not order.is_validated %}<a href="{% url 'admin-order-item-delete' event_id order.pk item.pk %}">Supprimer</a>{% endif %}</td>
+        </tr>
+    {% endfor %}
+        <tr><th scope="row" colspan="2">Total vente :</th><th scope="row">{{order_total}}</th><td></td></tr>
+    </tbody>
+</table>
+
+<form action="" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+    <button type="submit" name="cancel" class="btn btn-primary">Annuler</button>
+</form>
+
+{% endblock %}

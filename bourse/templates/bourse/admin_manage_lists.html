@@ -13,7 +13,7 @@
     </tr>
   </thead>
   <tbody>
-  {% for list in user_lists %}
+  {% for list in userlist_list %}
     {% if list.list_status == 1 %}
     <tr class="bg-danger">
     {% elif list.list_status == 3 %}
@@ -38,5 +38,5 @@
   {% endfor %}
   </tbody>
 </table>
-<a href="{% url 'admin-dashboard' event_id %}">Retour Dashboard</a>
+<a href="{% url 'admin-dashboard' view.kwargs.pk %}">Retour Dashboard</a>
 {% endblock %}

@@ -5,7 +5,7 @@
 {% if event_inst %}
     {% for event in event_inst %}
     <h2>{{ event.event_name }} du {{ event.date_only }}</h2>
-    <h4>Statut : {{ event.status_desc }} (<a href="#">Modifier</a>)</h4>
+    <h4>Statut : {{ event.status_desc }} (<a href="{% url 'admin-event-update' event.id %}">Modifier</a>)</h4>
     <table class="table">
         <thread><tr><th scope="col">#</th><th scope="col">État</th></tr></thread>
         <tr><td colspan="2">Listes : <a href="{% url 'admin-lists-manage' event.id %}">Visualiser</a></td></tr>
@@ -18,7 +18,7 @@
         <tr><td>{{ item_sold_total }}</td><td>jeux vendus.</td></tr>
         <tr><td>{{ item_sold_price_total }}</td><td>€ de ventes.</td></tr>
         <tr><td colspan="2">Commandes : 
-            {% if event.status == 3 %}<a href="{% url 'admin-order-create' event.pk %}" >Créer</a> {% endif %}
+            {% if event.status == 3 %}<a href="{% url 'admin-ordercreate' event.pk %}" >Créer</a> {% endif %}
             {% if event.status >= 3 %}<a href="{% url 'admin-orders' event.pk %}" >Visualiser</a> {% endif %}
             </td>
         </tr>

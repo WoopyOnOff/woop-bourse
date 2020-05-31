@@ -48,6 +48,8 @@ class UserList(models.Model):
     def status_desc(self):
         val = self.LIST_STATUSES[( self.list_status - 1 )][1]
         return val
+    def item_set_sorted(self):
+        return self.item_set.all().order_by('-created_date')
     def __str__(self):
         return self.user.username + ' - ' + self.event.event_name + ' - ' + self.event.date_only() + ' - ' + self.status_desc()
 
@@ -79,3 +81,5 @@ class OrderItem(models.Model):
     item = models.ForeignKey(Item, on_delete=models.CASCADE)
     def __str__(self):
         return str(self.order.id) + ' ' + self.item.name
+    def itemprice(self):
+        return self.item.price

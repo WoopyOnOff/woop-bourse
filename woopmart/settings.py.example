@@ -132,6 +132,9 @@ USE_TZ = True
 STATIC_URL = '/static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, "static/") # for production
 
+# LOGIN SETTINGS
+LOGIN_REDIRECT_URL = '/bourse'
+
 # django-registration settings
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window
 
