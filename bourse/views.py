@@ -1,5 +1,6 @@
+# Django Imports
 from django.shortcuts import get_object_or_404,render,redirect
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, FileResponse
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -8,12 +9,13 @@ from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.db.models import Sum
-import datetime
-
-# Create your views here.
+# Sys
+import datetime, io
+# Other Django imports
 from .models import Event, UserList, Item, Order, OrderItem
 from django.contrib.auth.models import User
 from .forms import UserForm, ItemForm, ListValidateForm, EventForm, OrderModelForm, OrderItemFormset, ItemTextForm, ListManageForm
+from .printing import MyPrint
 
 #############
 ### Index ###
@@ -208,6 +210,31 @@ class ListsListView(UserPassesTestMixin,generic.ListView):
     def get_queryset(self):
         return UserList.objects.filter(event=self.kwargs.get('pk')).order_by('validated_date')
 
+# Generation de PDF de la liste de l'utilisateur
+@login_required
+def ListDetailPdfGen(request,event_id,list_id,var):
+    event = get_object_or_404(Event,pk=event_id)
+    user_list = get_object_or_404(UserList,pk=list_id,event=event_id)
+    user_list_items = Item.objects.filter(list=list_id)
+    filename = 'EVT_' + str(event_id) + '_LST_'+ str(list_id) + '.pdf'
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename=' + filename
+    if var=='post':
+        post=True
+    elif var=='pre':
+        post=False
+    else:
+        return HttpResponseForbidden()
+    if request.user.is_staff == 1:
+        buffer = io.BytesIO()
+        report = MyPrint(buffer, 'A4')
+        pdf = report.createDoc(event,user_list,user_list_items,post=post)
+        response.write(pdf)
+        return response
+    else:
+        return HttpResponseForbidden()
+
+
 # Visu et changement de status d'une liste
 @login_required
 def ListDetailValidate(request,event_id,list_id):
@@ -273,8 +300,8 @@ def OrderDetailValidate(request,event_id,order_id):
                 form_item = ItemTextForm(request.POST)
                 if form_item.is_valid():
                     order_item_pk = form_item.clean_item_pk()
-                    if Item.objects.filter(list__event=event_id,pk=order_item_pk,is_sold=False).exists():
-                        item = Item.objects.filter(list__event=event_id).get(pk=order_item_pk)
+                    if Item.objects.filter(pk=order_item_pk,list__list_status=3,is_sold=False,list__event=event_id).exists():
+                        item = Item.objects.get(pk=order_item_pk)
                         OrderItem.objects.create(order=order,item=item)
                     return HttpResponseRedirect("")
                 else:

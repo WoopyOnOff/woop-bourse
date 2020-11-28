@@ -4,6 +4,7 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from django.forms import ModelForm
+from django.template.defaultfilters import date as _date
 
 # Create your models here.
 class Event(models.Model):
@@ -19,9 +20,9 @@ class Event(models.Model):
     def get_absolute_url(self):
         return reverse('event-detail', args=[str(self.id)])
     def date_only(self):
-        return self.event_date.strftime('%d %B %Y')
+        return _date(self.event_date,'d F Y')
     def hour_only(self):
-        return self.event_date.strftime('%Hh%M')
+        return _date(self.event_date,'H:i')
     def status_desc(self):
         val = self.STATUSES[( self.status - 1 )][1]
         return val
@@ -73,7 +74,7 @@ class Order(models.Model):
     created_date = models.DateTimeField('Date Created', auto_now_add=True)
     is_validated = models.BooleanField('Order Validated',default=False)
     def __str__(self):
-        return self.event.event_name + ' - ' + str(self.pk) + ' - ' + self.created_date.strftime('%d/%m/%y %H:%M:%S')
+        return self.event.event_name + ' - ' + str(self.pk) + ' - ' + _date(self.created_date,'d/m/Y H:i:s')
 
 class OrderItem(models.Model):
     # Modele des elements (jeux) des bons de vente

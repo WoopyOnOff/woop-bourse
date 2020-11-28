@@ -40,6 +40,8 @@ urlpatterns = [
     path('admin/<int:pk>/edit',views.EventUpdate.as_view(),name='admin-event-update'),
     # Listes des utilisateurs
     path('admin/<int:pk>/managelists',views.ListsListView.as_view(),name='admin-lists-manage'),
+    # Generation PDF depot et etiquettes / PDF Fin de vente
+    path('admin/<int:event_id>/list/<int:list_id>/pdfgen/<str:var>',views.ListDetailPdfGen,name='admin-list-pdf'),
     # Changement de status d'une liste d'un utilisateur (détail)
     path('admin/<int:event_id>/list/<int:list_id>/validate',views.ListDetailValidate,name='admin-list-validate'),
     # Liste des bons de ventes

@@ -31,7 +31,9 @@
       </td>
       <td>{{ list.validated_date }}</td>
       <td>
-        {% if list.list_status == 3 %} <a href="#">PDF</a>
+        {% if list.list_status == 3 %} <a href="{% url 'admin-list-pdf' list.event.pk list.pk 'pre' %}">PDF Complet</a>
+        {% endif %}
+        {% if list.list_status == 4 %} <a href="{% url 'admin-list-pdf' list.event.pk list.pk 'post' %}">PDF Fin</a>
         {% endif %}
       </td>
     </tr>

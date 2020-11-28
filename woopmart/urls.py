@@ -19,11 +19,14 @@ from django.urls import include,path
 from django.contrib.auth import views
 from django.conf import settings
 from django.conf.urls.static import static
+#from django_registration.forms import RegistrationFormUniqueEmail
+#from django_registration.views import RegistrationView
 
 urlpatterns = [
     path('',RedirectView.as_view(url='bourse/',permanent=True)), # Redirection vers bourse/
     path('admin/', admin.site.urls),
     path('bourse/', include('bourse.urls')),
+    ###path('accounts/register2',RegistrationView.as_view(form_class=RegistrationFormUniqueEmail),name='django_registration_register'),
     path('accounts/', include('django_registration.backends.activation.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     # path('accounts/login', views.LoginView.as_view(), name='login'),
