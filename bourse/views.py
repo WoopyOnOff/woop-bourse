@@ -14,7 +14,7 @@ import datetime, io
 # Other Django imports
 from .models import Event, UserList, Item, Order, OrderItem
 from django.contrib.auth.models import User
-from .forms import UserForm, ItemForm, ListValidateForm, EventForm, OrderModelForm, OrderItemFormset, ItemTextForm, ListManageForm
+from .forms import UserForm, ItemForm, ListValidateForm, EventForm, OrderModelForm, OrderItemFormset, ItemTextForm, ListManageForm, InvoiceClientForm
 from .printing import MyPrint
 
 #############
@@ -350,6 +350,61 @@ class OrderItemDelete(UserPassesTestMixin,DeleteView):
             return HttpResponseRedirect(url)
         else:
             return super(OrderItemDelete, self).post(request, *args, **kwargs)
+
+# Formulaire avant facture pdf : détail client
+@login_required
+def OrderPreInvoicePdfGen(request,event_id,order_id):
+    template_name = 'bourse/admin_order_pre_invoice_form.html'
+    event = get_object_or_404(Event,pk=event_id)
+    order = get_object_or_404(Order,pk=order_id,event=event_id)
+    order_items = OrderItem.objects.filter(order=order_id)
+    cancel_url = redirect('admin-orders',event_id)
+    #success_url = redirect('admin-order-invoice-pdf',event_id,order_id)
+    filename = 'EVT_' + str(event_id) + '_INVOICE_'+ str(order_id) + '.pdf'
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename=' + filename
+    if request.user.is_staff == 1:
+        if request.method == 'POST':
+            if "cancel" in request.POST:
+                return cancel_url
+            elif "validate" in request.POST:
+                form = InvoiceClientForm(request.POST)
+                if form.is_valid():
+                    buffer = io.BytesIO()
+                    report = MyPrint(buffer, 'A4')
+                    pdf = report.createInvoice(event,order,order_items,form.cleaned_data)
+                    response.write(pdf)
+                    return response
+                    ##OrderDetailPdfGen(request,event_id,order_id,self.data) # TO DO
+                    ##return HttpResponseRedirect(reverse_lazy('admin-order-invoice-pdf',kwargs={'event_id':event_id,'order_id':order_id}))
+        else:
+            form = InvoiceClientForm()
+            context = { 
+                'form':form,
+                'event':event,
+                'order':order,
+                'order_items':order_items}
+            return render(request,template_name,context)
+    else:
+        return HttpResponseForbidden()
+
+# Generation du pdf de Facture pour une vente
+@login_required
+def OrderDetailPdfGen(request,event_id,order_id,*args):
+    event = get_object_or_404(Event,pk=event_id)
+    order = get_object_or_404(Order,pk=order_id,event=event_id)
+    order_items = OrderItem.objects.filter(order=order_id)
+    filename = 'EVT_' + str(event_id) + '_INVOICE_'+ str(order_id) + '.pdf'
+    response = HttpResponse(content_type='application/pdf')
+    response['Content-Disposition'] = 'attachment; filename=' + filename
+    if request.user.is_staff == 1:
+        buffer = io.BytesIO()
+        report = MyPrint(buffer, 'A4')
+        pdf = report.createInvoice(event,order,order_items)
+        response.write(pdf)
+        return response
+    else:
+        return HttpResponseForbidden()
 
 # Visualisation des commandes de la bourse
 class OrdersListView(UserPassesTestMixin,generic.ListView):

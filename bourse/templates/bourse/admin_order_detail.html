@@ -42,7 +42,7 @@
     {% csrf_token %}
     {{ form|crispy }}
     <button type="submit" class="btn btn-primary">Enregistrer</button>
-    <button type="submit" name="cancel" class="btn btn-primary">Annuler</button>
+    <button type="submit" formnovalidate name="cancel" class="btn btn-secondary">Annuler</button>
 </form>
 
 {% endblock %}

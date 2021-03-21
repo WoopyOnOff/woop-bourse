@@ -191,3 +191,92 @@ class MyPrint:
         pdf = buffer.getvalue()
         buffer.close()
         return pdf
+    
+    # Création du document PDF facture
+    def createInvoice(self,event,order,order_items,form_data):
+        buffer=self.buffer
+        self.c.setTitle('Facture de vente n°' + str(order.id))
+        event_desc = event.event_name + ' du ' + event.date_only()
+        my_black = colors.black
+        my_grey = colors.lightgrey
+        # Titre de page
+        title = Paragraph(event_desc, self.styles['Heading1'])
+        # Sous-titre
+        sub_title = Paragraph('Facture de vente n°' + str(order.id), self.styles['Heading2'])
+        # Box vendeur
+        seller_address = [[settings.ASSO_NAME]]
+        for line in settings.ASSO_ADDR:
+            seller_address.append([line])
+        seller_address_table = Table(seller_address)
+        seller_address_table.setStyle(TableStyle([('BOX',(0,0),(-1,-1),0.5,my_grey)]))
+        # Box acheteur ( A PEAUFINER )
+        client_address = [[Paragraph('Client Facturé :',self.styles['BodyText'])],
+                            [form_data['client_name']],[form_data['addr_1']],[form_data['addr_2']],[form_data['cp_city']]
+                        ]
+        client_address_table = Table(client_address)
+        client_address_table.setStyle(TableStyle([('BOX',(0,1),(-1,-1),0.5,my_grey)]))
+
+        total_invoice = 0
+        nbMaxLinesPerPage = 18 # /!\ Pas plus de 18 éléments par page.
+        page_cur=1
+        # On parcourt les éléments de la vente pour générer les pages du pdf
+        table_data = []
+        for i,element in enumerate(order_items):
+
+            # On est sur une nouvelle page, affichage titre sous-titre - coordo asso et acheteur, initialisation tableaux
+            if i%nbMaxLinesPerPage == 0: 
+                # Titre et Sous-Titre
+                title.wrapOn(self.c, 17*cm, 1*cm)
+                title.drawOn(self.c, *self.coord(2,2,cm))
+                sub_title.wrapOn(self.c, 17*cm, 1*cm)
+                sub_title.drawOn(self.c, *self.coord(2,3,cm))
+                # Box vendeur
+                seller_address_table.wrapOn(self.c,5*cm,4*cm)
+                seller_address_table.drawOn(self.c, *self.coord(2,6,cm))
+                # Box acheteur
+                client_address_table.wrapOn(self.c,5*cm,4*cm)
+                client_address_table.drawOn(self.c, *self.coord(10,6,cm))
+                # Init Tabs
+                table_data = []
+                table_data.append(['Description','Prix de vente'])
+            
+            # Variables pour chaque ligne
+            total_invoice = total_invoice + element.item.price
+
+            # Ajout au tableau
+            table_data.append([element.item.name,str(element.item.price) + ' ' + settings.CURRENCY ])
+
+            # Si dernière ligne du tableau ou nbMaxLinesPerPage lignes affichées
+            if ( i == len(order_items) - 1 ) or i%nbMaxLinesPerPage == nbMaxLinesPerPage-1: 
+                if ( i == len(order_items) - 1 ):
+                    tot_label = 'Total :'
+                else:
+                    tot_label = 'Sous-total :'
+                # Ajout du total au tableau
+                sum_net = str(total_invoice) + ' ' + settings.CURRENCY
+                table_data.append([tot_label,sum_net])
+                # Create the item table
+                item_table = Table(table_data, colWidths=[12*cm,3*cm])
+                item_table.setStyle(TableStyle([('INNERGRID', (0, 0), (-1, -2), 0.25, my_black),
+                                                ('BOX', (0, 0), (-1, -2), 0.25, my_black),
+                                                ('ALIGN',(1, 1),(-1, -1),'RIGHT'),
+                                                ('ALIGN',(1, 0),(-1, 0),'CENTER'),
+                                                ('ALIGN',(0, -1),(1, -1),'RIGHT'),
+                                                ('GRID', (1, -1), (-1, -1), 0.25, my_black)
+                                                ]))
+                item_table.wrapOn(self.c, 15*cm, 18*cm)
+                item_table.drawOn(self.c, *self.coord(2,8+0.6*len(table_data),cm))
+                # Pages
+                pages_label = Paragraph('page ' + str(page_cur) + ' sur ' + str(ceil(len(order_items)/nbMaxLinesPerPage)),self.styles['BodyText'])
+                pages_label.wrapOn(self.c,5*cm,1*cm)
+                pages_label.drawOn(self.c,9.5*cm,0.5*cm)
+                page_cur += 1
+                # Page break
+                if i%nbMaxLinesPerPage == nbMaxLinesPerPage-1:
+                    self.c.showPage()
+        
+        # Sauvegarde et retour du fichier
+        self.c.save()
+        pdf = buffer.getvalue()
+        buffer.close()
+        return pdf

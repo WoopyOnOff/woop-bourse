@@ -151,3 +151,5 @@ CRISPY_TEMPLATE_PACK = 'bootstrap4'
 # APP SPECIAL CONF
 COMMISSION = 1
 CURRENCY = '€'
+ASSO_NAME = 'Your Association'
+ASSO_ADDR = ['99 address line one','99999 City']

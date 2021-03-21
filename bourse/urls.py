@@ -52,4 +52,8 @@ urlpatterns = [
     path('admin/<int:event_id>/order/<int:order_id>/manageorder',views.OrderDetailValidate,name='admin-ordermanage'),
     # Supression d'un élément du bon de vente
     path('admin/<int:event_id>/order/<int:order_id>/item/<int:pk>/delete',views.OrderItemDelete.as_view(),name='admin-order-item-delete'),
+    # Formulaire adresse client pour facture
+    path('admin/<int:event_id>/order/<int:order_id>/pdfinvoicepreform',views.OrderPreInvoicePdfGen,name='admin-order-pre-invoice-form'),
+    # Generation d'une facture de Vente
+    path('admin/<int:event_id>/order/<int:order_id>/pdfinvoice',views.OrderDetailPdfGen,name='admin-order-invoice-pdf'),
 ]

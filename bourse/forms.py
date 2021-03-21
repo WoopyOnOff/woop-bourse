@@ -62,3 +62,15 @@ class ListManageForm(forms.ModelForm):
     class Meta:
         model = UserList
         fields = ('list_status',)
+
+class InvoiceClientForm(forms.Form):
+    client_name = forms.CharField(label='Nom ou raison sociale')
+    addr_1 = forms.CharField(label='Adresse')
+    addr_2 = forms.CharField(label='Adresse (suite)')
+    cp_city = forms.CharField(label='CP Ville')
+    def __init__(self, *args, **kwargs):
+        event_id = kwargs.pop('event_id', None)
+        super(InvoiceClientForm, self).__init__(*args, **kwargs)
+    def clean_form(self):
+        data = self.cleaned_data['client_name','addr_1','addr_2','cp_city']
+        return data

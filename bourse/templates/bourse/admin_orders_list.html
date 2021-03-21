@@ -19,7 +19,7 @@
                 <td>{{ order.created_date }}</td>
                 <td>{% if order.is_validated %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
                 <td><a href="{% url 'admin-ordermanage' view.kwargs.event_id order.pk %}">Détail</a></td>
-                <td>{% if order.is_validated %}<a href="#">PDF</a>{% endif %}</td>
+                <td>{% if order.is_validated %}<a href="{% url 'admin-order-pre-invoice-form' view.kwargs.event_id order.pk %}">PDF</a>{% endif %}</td>
             </tr>
         {% endfor %}
         </tbody>
