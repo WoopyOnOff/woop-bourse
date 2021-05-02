@@ -121,6 +121,7 @@ class MyPrint:
             price_tags_data.append([price_currency])
             # Si dernière ligne du tableau ou nbMaxLinesPerPage lignes affichées
             if ( i == len(user_list_items) - 1 ) or i%nbMaxLinesPerPage == nbMaxLinesPerPage-1: 
+                # Si dernière ligne affichage de l'encadré à signer
                 if ( i == len(user_list_items) - 1 ):
                     tot_label = 'Total :'
                     table_fin = Table([
@@ -150,8 +151,10 @@ class MyPrint:
                                                 ('ALIGN',(3, 1),(-2, -1),'CENTER'),
                                                 ('GRID', (-2, -1), (-1, -1), 0.25, my_black)
                                                 ]))
+                # Passage en blanc de toutes les données du tableau, sauf les 'X' et totaux.
                 if post:
-                    item_table.setStyle(TableStyle([('TEXTCOLOR', (0, 0), (-3, -1), my_black),('TEXTCOLOR', (0, 0), (-1, 1), my_black)]))
+                    item_table.setStyle(TableStyle([('TEXTCOLOR', (0, 0), (-3, -1), my_black),('TEXTCOLOR', (-1, 0), (-1, -2), my_black),('TEXTCOLOR', (-3, 0), (-2, 1), my_black)]))
+                # Affichage du tableau
                 item_table.wrapOn(self.c, 15*cm, 18*cm)
                 item_table.drawOn(self.c, *self.coord(2,5+0.6*len(table_data),cm))
                 # Create the price tags table

@@ -5,6 +5,7 @@
 {% url 'login' as login_url %}
 {% url 'profile-edit' as profile_url %}
 {% url 'logout' as logout_url %}
+{% url 'admin:index' as admin_url %}
 <!-- Fixed navbar -->
 <nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
     <a class="navbar-brand" href="{% url 'index' %}">Woopy On Off</a>
@@ -33,7 +34,12 @@
           <li class="nav-item {% if request.path == login_url %} active {%endif%}">
             <a class="nav-link" href="{% url 'login' %}?next={% url 'index' %}">Se connecter</a>
           </li>
-          {% else %}
+        {% else %}
+          {% if user.is_staff %}
+          <li class="nav-item {% if request.path == admin_url %} active {%endif%}">
+            <a class="nav-link" href="{% url 'admin:index' %}">Admin Django</a>
+          </li>
+          {% endif %}
           <li class="nav-item {% if request.path == profile_url %} active {%endif%}">
             <a class="nav-link" href="{% url 'profile-edit' user.pk %}">Mon compte ({{ user.get_username }})</a>
           </li>
