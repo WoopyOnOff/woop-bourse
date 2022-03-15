@@ -70,6 +70,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'bourse.context_processors.site_params',
             ],
         },
     },
@@ -135,6 +136,9 @@ STATIC_URL = '/static/'
 # LOGIN SETTINGS
 LOGIN_REDIRECT_URL = '/bourse'
 
+# Migration 3.2
+DEFAULT_AUTO_FIELD = 'django.db.models.AutoField'
+
 # django-registration settings
 ACCOUNT_ACTIVATION_DAYS = 7 # One-week activation window
 
@@ -149,6 +153,8 @@ EMAIL_USE_TLS = True
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
 
 # APP SPECIAL CONF
+SITE_TITLE = 'Bourses aux Jeux Woopy On Off'
+SITE_SIGNATURE = 'Bourses aux jeux - Woopy On Off - 2022'
 COMMISSION = 1
 CURRENCY = '€'
 ASSO_NAME = 'Your Association'
