@@ -1,3 +1,4 @@
-django-bootstrap4
-django-registration
-django-crispy-forms
+Django<3.3,>3.2
+django-bootstrap4==22.1
+django-registration==3.2
+django-crispy-forms==1.14
