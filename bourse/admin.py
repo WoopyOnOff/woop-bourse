@@ -1,7 +1,7 @@
 from django.contrib import admin
 
 # Register your models here.
-from .models import Event, UserList, Order, Item, OrderItem
+from .models import Event, UserList, Order, Item, OrderItem, Page
 
 @admin.register(Event)
 class EventAdmin(admin.ModelAdmin):
@@ -28,3 +28,7 @@ class OrderItemInline(admin.TabularInline):
 class OrderAdmin(admin.ModelAdmin):
     list_display = ('id','event','created_date','is_validated')
     inlines = [OrderItemInline]
+
+@admin.register(Page)
+class PageAdmin(admin.ModelAdmin):
+    read_only_fields = ['created', 'timestamp']

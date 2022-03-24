@@ -9,10 +9,11 @@ from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.db.models import Sum
+from django.contrib.messages.views import SuccessMessageMixin
 # Sys
 import datetime, io
 # Other Django imports
-from .models import Event, UserList, Item, Order, OrderItem
+from .models import Event, UserList, Item, Order, OrderItem, Page
 from django.contrib.auth.models import User
 from .forms import UserForm, ItemForm, ListValidateForm, EventForm, OrderModelForm, OrderItemFormset, ItemTextForm, ListManageForm, InvoiceClientForm
 from .printing import MyPrint
@@ -22,18 +23,21 @@ from .printing import MyPrint
 #############
 def index(request):
     opened_registration_event = Event.objects.filter(status=1)
+    index_content = get_object_or_404(Page,id=1)
     context = {
         'opened_registration_event': opened_registration_event,
+        'index_content': index_content,
     }
     return render(request, 'index.html', context=context)
 
 ##########################
 ### Profil Utilisateur ###
 ##########################
-class ProfileUpdate(LoginRequiredMixin,UpdateView):
+class ProfileUpdate(LoginRequiredMixin,SuccessMessageMixin,UpdateView):
     model = User
     form_class = UserForm
     template_name = 'bourse/profile_edit.html'
+    success_message = "Profil mis a jour."
     def get_queryset(self):
         return User.objects.filter(pk=self.request.user.id)
     def get_success_url(self):

@@ -13,4 +13,7 @@
     {% else %}
         <h2>Pas d'evenement disponible.</h2>
     {% endif %}
+
+    <h2>{{ index_content.content|safe }}</h2>
+
 {% endblock %}

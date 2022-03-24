@@ -43,6 +43,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'django_registration',
     'crispy_forms',
+    'django_ckeditor',
 ]
 
 MIDDLEWARE = [
@@ -132,6 +133,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 # STATIC_ROOT = os.path.join(BASE_DIR, "static/") # for production
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
 # LOGIN SETTINGS
 LOGIN_REDIRECT_URL = '/bourse'
@@ -151,6 +154,15 @@ EMAIL_USE_TLS = True
 
 # CRISPY_FORMS_CONF
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
+
+# CKEDITOR_CONFIGS
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 600,
+        'width': 600,
+    },
+}
 
 # APP SPECIAL CONF
 SITE_TITLE = 'Bourses aux Jeux Woopy On Off'
