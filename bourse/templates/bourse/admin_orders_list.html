@@ -18,8 +18,8 @@
                 <th scope="row">{{order.pk}}</th>
                 <td>{{ order.created_date }}</td>
                 <td>{% if order.is_validated %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
-                <td><a href="{% url 'admin-ordermanage' view.kwargs.event_id order.pk %}">Détail</a></td>
-                <td>{% if order.is_validated %}<a href="{% url 'admin-order-pre-invoice-form' view.kwargs.event_id order.pk %}">PDF</a>{% endif %}</td>
+                <td><a href="{% url 'bourse:admin-ordermanage' view.kwargs.event_id order.pk %}">Détail</a></td>
+                <td>{% if order.is_validated %}<a href="{% url 'bourse:admin-order-pre-invoice-form' view.kwargs.event_id order.pk %}">PDF</a>{% endif %}</td>
             </tr>
         {% endfor %}
         </tbody>
@@ -27,5 +27,5 @@
     {% else %}
         <p>Il n'y a actuellement aucune commande.</p>
     {% endif %}
-    <a href="{% url 'admin-dashboard' view.kwargs.event_id %}">Retour Dashboard</a>
+    <a href="{% url 'bourse:admin-dashboard' view.kwargs.event_id %}">Retour Dashboard</a>
 {% endblock %}

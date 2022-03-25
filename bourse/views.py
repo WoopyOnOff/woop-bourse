@@ -41,7 +41,7 @@ class ProfileUpdate(LoginRequiredMixin,SuccessMessageMixin,UpdateView):
     def get_queryset(self):
         return User.objects.filter(pk=self.request.user.id)
     def get_success_url(self):
-        return reverse('profile-edit',kwargs={'pk':self.object.pk})
+        return reverse('bourse:profile-edit',kwargs={'pk':self.object.pk})
 
 #######################
 ### Vues Événements ###
@@ -61,8 +61,8 @@ class EventDetailView(generic.DetailView):
 @login_required
 def user_list_create_or_view(request, event_id):
     event_inst = get_object_or_404(Event,id=event_id,status=1)
-    user_list, created = UserList.objects.get_or_create(event=event_inst,user=request.user)
-    return redirect('my-lists')
+    user_list = UserList.objects.get_or_create(event=event_inst,user=request.user)
+    return redirect('bourse:my-list-view',user_list[0].pk)
 
 # Listes de l'utilisateur
 class ListsByUserListView(LoginRequiredMixin,generic.ListView):
@@ -89,7 +89,7 @@ class ListDetailByUserDetailView(LoginRequiredMixin,generic.DetailView):
 @login_required
 def ListValidate(request,pk):
     list_instance = get_object_or_404(UserList,pk=pk,user=request.user,list_status=1,event__status=1)
-    success_url = redirect('my-list-view',list_instance.pk)
+    success_url = redirect('bourse:my-list-view',list_instance.pk)
     if request.method == 'POST':
         if "cancel" in request.POST:
             return success_url
@@ -121,7 +121,7 @@ class ItemCreate(LoginRequiredMixin,CreateView):
         self.object.list_id = self.kwargs.get('list_id', None)
         if UserList.objects.filter(user=self.request.user,id=self.object.list_id,list_status=1,event__status=1):
             self.object.save()
-            return redirect('my-list-view',self.object.list_id)
+            return redirect('bourse:my-list-view',self.object.list_id)
         else:
             return HttpResponseForbidden()
 
@@ -137,7 +137,7 @@ class ItemUpdate(LoginRequiredMixin,UpdateView):
         self.object.list_id = self.kwargs.get('list_id', None)
         if UserList.objects.filter(user=self.request.user,id=self.object.list_id,list_status=1,event__status=1):
             self.object.save()
-            return redirect('my-list-view',self.object.list_id)
+            return redirect('bourse:my-list-view',self.object.list_id)
         else:
             return HttpResponseForbidden()
 
@@ -147,7 +147,7 @@ class ItemDelete(LoginRequiredMixin,DeleteView):
     def get_queryset(self):
         return Item.objects.filter(id=self.kwargs.get('pk'),list__user=self.request.user,list__list_status=1,list__event__status=1)
     def get_success_url(self):
-        return reverse_lazy('my-list-view',kwargs={'pk':self.kwargs.get('list_id','')})
+        return reverse_lazy('bourse:my-list-view',kwargs={'pk':self.kwargs.get('list_id','')})
     def post(self, request, *args, **kwargs):
         if "cancel" in request.POST:
             url = self.get_success_url()
@@ -201,7 +201,7 @@ class EventUpdate(UserPassesTestMixin,UpdateView):
     def form_valid(self, form):
         if self.request.user.is_staff == 1:
             self.object.save()
-            return redirect('admin-dashboard',self.kwargs.get('pk'))
+            return redirect('bourse:admin-dashboard',self.kwargs.get('pk'))
         else:
             return HttpResponseForbidden()
 
@@ -248,7 +248,7 @@ def ListDetailValidate(request,event_id,list_id):
     user_list_number_sold = user_list_items.filter(is_sold=True).count()
     user_list_total_sold = sum( int(item.price) for item in user_list_items.filter(is_sold=True) )
     user_list_total_sold_minus_com = sum( int(item.price) - settings.COMMISSION for item in user_list_items.filter(is_sold=True) )
-    success_url = redirect('admin-lists-manage',event_id)
+    success_url = redirect('bourse:admin-lists-manage',event_id)
     if request.user.is_staff == 1:
         if request.method == 'POST':
             if "cancel" in request.POST:
@@ -284,7 +284,7 @@ def order_create(request, event_id):
     if request.user.is_staff == 1:
         event_inst = get_object_or_404(Event,id=event_id,status=3)
         order = Order.objects.create(event=event_inst)
-        return redirect('admin-ordermanage', event_id, order.pk)
+        return redirect('bourse:admin-ordermanage', event_id, order.pk)
     else:
         return HttpResponseForbidden()
 
@@ -295,7 +295,7 @@ def OrderDetailValidate(request,event_id,order_id):
     order = get_object_or_404(Order,pk=order_id,event=event_id)
     order_items = OrderItem.objects.filter(order=order_id)
     order_total = sum( int(item.item.price) for item in order_items )
-    success_url = redirect('admin-orders',event_id)
+    success_url = redirect('bourse:admin-orders',event_id)
     if request.user.is_staff == 1:
         if request.method == 'POST':
             if "cancel" in request.POST:
@@ -347,7 +347,7 @@ class OrderItemDelete(UserPassesTestMixin,DeleteView):
     def get_queryset(self):
         return OrderItem.objects.filter(id=self.kwargs.get('pk'),order__is_validated=False,order__event__status=3)
     def get_success_url(self):
-        return reverse_lazy('admin-ordermanage',kwargs={'event_id':self.kwargs.get('event_id',''),'order_id':self.kwargs.get('order_id','')})
+        return reverse_lazy('bourse:admin-ordermanage',kwargs={'event_id':self.kwargs.get('event_id',''),'order_id':self.kwargs.get('order_id','')})
     def post(self, request, *args, **kwargs):
         if "cancel" in request.POST:
             url = self.get_success_url()
@@ -362,7 +362,7 @@ def OrderPreInvoicePdfGen(request,event_id,order_id):
     event = get_object_or_404(Event,pk=event_id)
     order = get_object_or_404(Order,pk=order_id,event=event_id)
     order_items = OrderItem.objects.filter(order=order_id)
-    cancel_url = redirect('admin-orders',event_id)
+    cancel_url = redirect('bourse:admin-orders',event_id)
     #success_url = redirect('admin-order-invoice-pdf',event_id,order_id)
     filename = 'EVT_' + str(event_id) + '_INVOICE_'+ str(order_id) + '.pdf'
     response = HttpResponse(content_type='application/pdf')

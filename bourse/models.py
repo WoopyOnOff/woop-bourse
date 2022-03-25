@@ -19,7 +19,7 @@ class Event(models.Model):
     def __str__(self):
         return self.event_name
     def get_absolute_url(self):
-        return reverse('event-detail', args=[str(self.id)])
+        return reverse('bourse:event-detail', kwargs={"pk": self.id})
     def date_only(self):
         return _date(self.event_date,'d F Y')
     def hour_only(self):
@@ -52,6 +52,8 @@ class UserList(models.Model):
         return val
     def item_set_sorted(self):
         return self.item_set.all().order_by('-created_date')
+    def get_absolute_url(self):
+        return reverse('bourse:my-list-view',kwargs={"pk": self.id})
     def __str__(self):
         return self.user.username + ' - ' + self.event.event_name + ' - ' + self.event.date_only() + ' - ' + self.status_desc()
 

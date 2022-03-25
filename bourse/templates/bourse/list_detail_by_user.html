@@ -5,7 +5,7 @@
 <h3>{{ userlist.list_label }}</h3>
 {% if userlist.is_editable and userlist.event_status == 1 %}
 <div class="row spacer"><div class="col-3 ">
-    <a href="{% url 'add-item-to-list' userlist.pk %}"><button class="btn btn-block btn-primary">Ajouter un jeu.</button></a>
+    <a href="{% url 'bourse:add-item-to-list' userlist.pk %}"><button class="btn btn-block btn-primary">Ajouter un jeu.</button></a>
 </div></div>
 <p></p>
 {% endif %}
@@ -30,7 +30,7 @@
             <td>{% if item.is_sold %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
             <td>{% if item.is_sold %}{{item.sold_date}}{% else %}-{% endif %}</td>
             {% if userlist.is_editable and userlist.event_status == 1 %}
-            <td><a href="{% url 'edit-item-from-list' userlist.pk item.pk %}">Éditer</a> / <a href="{% url 'del-item-from-list' userlist.pk item.pk %}">Supprimer</a></td>
+            <td><a href="{% url 'bourse:edit-item-from-list' userlist.pk item.pk %}">Éditer</a> / <a href="{% url 'bourse:del-item-from-list' userlist.pk item.pk %}">Supprimer</a></td>
             {% endif %}
         </tr>
         {% endfor %}
@@ -44,7 +44,7 @@
 {% if userlist.is_editable and userlist.event_status == 1 %}
 <p>Une fois prêt, validez votre liste, vous ne pourrez alors plus l'éditer.</p>
 <div class="row spacer"><div class="col-3 ">
-    <a href="{% url 'validate-list' userlist.pk %}"><button class="btn btn-block btn-primary">Valider ma liste.</button></a>
+    <a href="{% url 'bourse:validate-list' userlist.pk %}"><button class="btn btn-block btn-primary">Valider ma liste.</button></a>
 </div></div>
 {% else %}
     <p>Cette liste ne peut plus être modifiée.</p>

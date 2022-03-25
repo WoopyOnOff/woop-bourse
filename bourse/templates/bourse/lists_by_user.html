@@ -15,7 +15,7 @@
             <tr>
                 <td>{{list.list_label}}</td>
                 <td>{{list.event_status_desc}}</td>
-                <td><a href="{% url 'my-list-view' list.pk %}">{% if list.is_editable and list.event_status == 1 %} Éditer{% else %}Visualiser{% endif %}</a></td>
+                <td><a href="{% url 'bourse:my-list-view' list.pk %}">{% if list.is_editable and list.event_status == 1 %} Éditer{% else %}Visualiser{% endif %}</a></td>
             </tr>
             {% endfor %}
         </tbody>

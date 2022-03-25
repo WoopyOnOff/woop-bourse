@@ -5,10 +5,10 @@
 {% if event_inst %}
     {% for event in event_inst %}
     <h2>{{ event.event_name }} du {{ event.date_only }}</h2>
-    <h4>Statut : {{ event.status_desc }} (<a href="{% url 'admin-event-update' event.id %}">Modifier</a>)</h4>
+    <h4>Statut : {{ event.status_desc }} (<a href="{% url 'bourse:admin-event-update' event.id %}">Modifier</a>)</h4>
     <table class="table">
         <thread><tr><th scope="col">#</th><th scope="col">État</th></tr></thread>
-        <tr><td colspan="2">Listes : <a href="{% url 'admin-lists-manage' event.id %}">Visualiser</a></td></tr>
+        <tr><td colspan="2">Listes : <a href="{% url 'bourse:admin-lists-manage' event.id %}">Visualiser</a></td></tr>
         <tr><td>{{ user_lists_editable }}</td><td>listes en cours d'édition.</td></tr>
         <tr><td>{{ user_lists_validated }}</td><td>listes validées par les utilisateurs.</td></tr>
         <tr><td>{{ user_lists_adminvalidated }}</td><td>listes validées par l'admin.</td></tr>
@@ -18,8 +18,8 @@
         <tr><td>{{ item_sold_total }}</td><td>jeux vendus.</td></tr>
         <tr><td>{{ item_sold_price_total }}</td><td>€ de ventes.</td></tr>
         <tr><td colspan="2">Commandes : 
-            {% if event.status == 3 %}<a href="{% url 'admin-ordercreate' event.pk %}" >Créer</a> {% endif %}
-            {% if event.status >= 3 %}<a href="{% url 'admin-orders' event.pk %}" >Visualiser</a> {% endif %}
+            {% if event.status == 3 %}<a href="{% url 'bourse:admin-ordercreate' event.pk %}" >Créer</a> {% endif %}
+            {% if event.status >= 3 %}<a href="{% url 'bourse:admin-orders' event.pk %}" >Visualiser</a> {% endif %}
             </td>
         </tr>
         <tr><td>{{ order_total }}</td><td>ventes totales.</td></tr>

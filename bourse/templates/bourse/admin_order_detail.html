@@ -31,7 +31,7 @@
             <th scope="row">{{item.item.pk}}</th>
             <td>{{ item.item.name }}</td>
             <td>{{ item.item.price }}</td>
-            <td>{% if not order.is_validated %}<a href="{% url 'admin-order-item-delete' event_id order.pk item.pk %}">Supprimer</a>{% endif %}</td>
+            <td>{% if not order.is_validated %}<a href="{% url 'bourse:admin-order-item-delete' event_id order.pk item.pk %}">Supprimer</a>{% endif %}</td>
         </tr>
     {% endfor %}
         <tr><th scope="row" colspan="2">Total vente :</th><th scope="row">{{order_total}}</th><td></td></tr>

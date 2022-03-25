@@ -6,7 +6,7 @@
   <ul>
     {% for event in event_list %}
       <li>
-        <a href="{{ event.get_absolute_url }}">{{ event.event_name }} du {{ event.date_only }}</a> ({{event.status_desc}}) {% if user.is_staff %}(Admin: <a href="{% url 'admin-dashboard' event.pk %}">Dashboard</a> ){% endif %}
+        <a href="{{ event.get_absolute_url }}">{{ event.event_name }} du {{ event.date_only }}</a> ({{event.status_desc}}) {% if user.is_staff %}(Admin: <a href="{% url 'bourse:admin-dashboard' event.pk %}">Dashboard</a> ){% endif %}
       </li>
     {% endfor %}
   </ul>
