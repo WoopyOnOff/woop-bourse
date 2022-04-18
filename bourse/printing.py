@@ -153,7 +153,7 @@ class MyPrint:
                                                 ]))
                 # Passage en blanc de toutes les données du tableau, sauf les 'X' et totaux.
                 if post:
-                    item_table.setStyle(TableStyle([('TEXTCOLOR', (0, 0), (-3, -1), my_black),('TEXTCOLOR', (-1, 0), (-1, -2), my_black),('TEXTCOLOR', (-3, 0), (-2, 1), my_black)]))
+                    item_table.setStyle(TableStyle([('TEXTCOLOR', (0, 0), (-3, -1), my_black),('TEXTCOLOR', (0, 0), (-1, 0), my_black)]))
                 # Affichage du tableau
                 item_table.wrapOn(self.c, 15*cm, 18*cm)
                 item_table.drawOn(self.c, *self.coord(2,5+0.6*len(table_data),cm))
