@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     'bootstrap4',
     'django_registration',
     'crispy_forms',
-    'django_ckeditor',
+    'ckeditor',
     'django_htmx',
 ]
 
@@ -175,4 +175,4 @@ COMMISSION = 1
 CURRENCY = '€'
 ASSO_NAME = 'Your Association'
 ASSO_ADDR = ['99 address line one','99999 City']
-ASSO_SIRET = ''
+ASSO_SIRET = '99999999999999'
