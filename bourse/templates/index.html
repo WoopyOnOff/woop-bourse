@@ -1,19 +1,11 @@
 {% extends "base_generic.html" %}
 
 {% block content %}
-    <h1>Bienvenue sur le site des bourses aux jeux</h1>
 
-    {% if opened_registration_event %}
-        <h2>Prochain événement :</h2>
-        <ul>
-        {% for event in opened_registration_event %}
-            <li>{{ event.event_name }} du {{ event.date_only }}</li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <h2>Pas d'evenement disponible.</h2>
-    {% endif %}
-
-    <h2>{{ index_content.content|safe }}</h2>
+{% if index_content %}
+    {{ index_content.content|safe }}
+{% else %}
+    <h3>Il faut ajouter une page avec pour titre « Accueil » dans l'admin Django.</h3>
+{% endif %}
 
 {% endblock %}

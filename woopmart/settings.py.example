@@ -129,6 +129,8 @@ USE_L10N = True
 
 USE_TZ = True
 
+# MESSAGES
+MESSAGE_STORAGE = 'django.contrib.messages.storage.session.SessionStorage'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.0/howto/static-files/
@@ -162,7 +164,7 @@ CKEDITOR_CONFIGS = {
     'default': {
         'toolbar': 'full',
         'height': 600,
-        'width': 600,
+        'width': 800,
     },
 }
 
@@ -173,3 +175,4 @@ COMMISSION = 1
 CURRENCY = '€'
 ASSO_NAME = 'Your Association'
 ASSO_ADDR = ['99 address line one','99999 City']
+ASSO_SIRET = ''

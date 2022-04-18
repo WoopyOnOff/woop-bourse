@@ -210,12 +210,13 @@ class MyPrint:
         seller_address = [[settings.ASSO_NAME]]
         for line in settings.ASSO_ADDR:
             seller_address.append([line])
+        seller_address.append(['Siret n°' + settings.ASSO_SIRET])
         seller_address_table = Table(seller_address)
         seller_address_table.setStyle(TableStyle([('BOX',(0,0),(-1,-1),0.5,my_grey)]))
         # Box acheteur ( A PEAUFINER )
-        client_address = [[Paragraph('Client Facturé :',self.styles['BodyText'])],
-                            [form_data['client_name']],[form_data['addr_1']],[form_data['addr_2']],[form_data['cp_city']]
-                        ]
+        client_address = [[Paragraph('Client Facturé :',self.styles['BodyText'])],]
+        for val in form_data.values():
+            client_address.append([val])
         client_address_table = Table(client_address)
         client_address_table.setStyle(TableStyle([('BOX',(0,1),(-1,-1),0.5,my_grey)]))
 

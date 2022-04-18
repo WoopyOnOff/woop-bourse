@@ -52,7 +52,7 @@ class ItemTextForm(forms.Form):
         super(ItemTextForm, self).__init__(*args, **kwargs)
     def clean_item_pk(self):
         data = self.cleaned_data['item_pk']
-        if not Item.objects.filter(pk=data,is_sold=False).exists() or OrderItem.objects.filter(item=data):
+        if not Item.objects.filter(pk=data,is_sold=False,list__list_status=3).exists() or OrderItem.objects.filter(item=data):
             raise ValidationError(_('Jeu non trouvé, ou déjà vendu.'), code='invalid')
         return data
 # Orders
@@ -66,7 +66,7 @@ class ListManageForm(forms.ModelForm):
 class InvoiceClientForm(forms.Form):
     client_name = forms.CharField(label='Nom ou raison sociale')
     addr_1 = forms.CharField(label='Adresse')
-    addr_2 = forms.CharField(label='Adresse (suite)')
+    addr_2 = forms.CharField(label='Adresse (suite)',initial=' ',show_hidden_initial=False, required=False)
     cp_city = forms.CharField(label='CP Ville')
     def __init__(self, *args, **kwargs):
         event_id = kwargs.pop('event_id', None)

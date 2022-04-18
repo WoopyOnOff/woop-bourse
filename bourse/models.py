@@ -15,7 +15,7 @@ class Event(models.Model):
     event_date = models.DateTimeField('Event Date')
     STATUSES = ((1,'Saisie Ouverte'),(2,'Saisie Fermée'),(3,'Bourse Ouverte'),(4,'Bourse Fermée'),)
     status = models.IntegerField('Event Status',default=2,choices=STATUSES)
-    comments = models.TextField(max_length=2000)
+    comments = RichTextField()
     def __str__(self):
         return self.event_name
     def get_absolute_url(self):

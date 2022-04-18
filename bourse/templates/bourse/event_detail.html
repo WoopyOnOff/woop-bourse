@@ -3,13 +3,13 @@
 {% block content %}
 
 <h1>{{ event.event_name }} du {{ event.date_only }}</h1>
-<p>{{ event.location }}</p>
-<p>{{ event.comments }}</p>
+<h2>{{ event.event_location }}</h2>
+<p>{{ event.comments|safe }}</p>
 
 <div style="margin-left:20px;margin-top:20px">
-    <h4>État :</h4>
+    <h4>État de la bourse aux jeux :</h4>
     {% if event.status == 1 %}
-        <p>- Bourse Ouverte aux inscriptions - {% if user.is_authenticated %}<a href="{% url 'bourse:user-list-create-or-view' event.id %}">Participer !</a>{% endif %}</p>
+        <p>La bourse est ouverte aux inscriptions : {% if user.is_authenticated %}<a href="{% url 'bourse:user-list-create-or-view' event.id %}">Participer !</a>{% else %}<a href="{% url 'login' %}">Se connecter !</a>{% endif %}</p>
     {% else %}
         <p>{{event.status_desc}}</p>
     {% endif %}

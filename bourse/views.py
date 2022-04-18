@@ -10,6 +10,8 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.db.models import Sum
 from django.contrib.messages.views import SuccessMessageMixin
+from django.contrib import messages
+
 # Sys
 import datetime, io
 # Other Django imports
@@ -22,10 +24,10 @@ from .printing import MyPrint
 ### Index ###
 #############
 def index(request):
-    opened_registration_event = Event.objects.filter(status=1)
-    index_content = get_object_or_404(Page,id=1)
+    # opened_registration_event = Event.objects.filter(status=1)
+    index_content = get_object_or_404(Page,title='Accueil')
     context = {
-        'opened_registration_event': opened_registration_event,
+        # 'opened_registration_event': opened_registration_event,
         'index_content': index_content,
     }
     return render(request, 'index.html', context=context)
@@ -92,6 +94,7 @@ def ListValidate(request,pk):
     success_url = redirect('bourse:my-list-view',list_instance.pk)
     if request.method == 'POST':
         if "cancel" in request.POST:
+            messages.warning(request, 'Votre liste n\'a pas été validée.')
             return success_url
         else:
             form = ListValidateForm(request.POST)
@@ -99,6 +102,7 @@ def ListValidate(request,pk):
                 list_instance.list_status = 2
                 list_instance.validated_date = datetime.datetime.now()
                 list_instance.save()
+                messages.success(request, 'Votre liste est validée.')
                 return success_url
     else:
         form = ListValidateForm()
@@ -121,6 +125,7 @@ class ItemCreate(LoginRequiredMixin,CreateView):
         self.object.list_id = self.kwargs.get('list_id', None)
         if UserList.objects.filter(user=self.request.user,id=self.object.list_id,list_status=1,event__status=1):
             self.object.save()
+            messages.success(self.request, 'Jeu %s correctement ajouté.' % self.object.name)
             return redirect('bourse:my-list-view',self.object.list_id)
         else:
             return HttpResponseForbidden()
@@ -137,6 +142,7 @@ class ItemUpdate(LoginRequiredMixin,UpdateView):
         self.object.list_id = self.kwargs.get('list_id', None)
         if UserList.objects.filter(user=self.request.user,id=self.object.list_id,list_status=1,event__status=1):
             self.object.save()
+            messages.success(self.request, 'Jeu %s mis à jour.' % self.object.name)
             return redirect('bourse:my-list-view',self.object.list_id)
         else:
             return HttpResponseForbidden()
@@ -147,11 +153,12 @@ class ItemDelete(LoginRequiredMixin,DeleteView):
     def get_queryset(self):
         return Item.objects.filter(id=self.kwargs.get('pk'),list__user=self.request.user,list__list_status=1,list__event__status=1)
     def get_success_url(self):
-        return reverse_lazy('bourse:my-list-view',kwargs={'pk':self.kwargs.get('list_id','')})
+        messages.success(self.request, 'Le jeu %s est supprimé.' % self.object.name)
+        return reverse_lazy('bourse:my-list-view',kwargs={'pk':self.kwargs.get('list_id')})
     def post(self, request, *args, **kwargs):
         if "cancel" in request.POST:
-            url = self.get_success_url()
-            return HttpResponseRedirect(url)
+            messages.warning(request, 'Le jeu n\'a pas été supprimé.')
+            return redirect('bourse:my-list-view',self.kwargs.get('list_id'))
         else:
             return super(ItemDelete, self).post(request, *args, **kwargs)
 
@@ -168,7 +175,7 @@ def Dashboard(request,event_id):
         user_lists_validated = UserList.objects.filter(event=event_id,list_status=2).count()
         user_lists_editable = UserList.objects.filter(event=event_id,list_status=1).count()
         user_lists_adminvalidated = UserList.objects.filter(event=event_id,list_status=3).count()
-        item_total = Item.objects.filter(list__event=event_id).count()
+        item_total = Item.objects.filter(list__event=event_id,list__list_status=3).count()
         item_sold = Item.objects.filter(list__event=event_id,is_sold=True)
         item_sold_total = item_sold.count()
         item_sold_price_total = sum( int(item.price) for item in item_sold )
@@ -307,8 +314,10 @@ def OrderDetailValidate(request,event_id,order_id):
                     if Item.objects.filter(pk=order_item_pk,list__list_status=3,is_sold=False,list__event=event_id).exists():
                         item = Item.objects.get(pk=order_item_pk)
                         OrderItem.objects.create(order=order,item=item)
+                    messages.success(request, 'Le jeu est ajouté.')
                     return HttpResponseRedirect("")
                 else:
+                    messages.error(request, 'Problème à l\'ajout du jeu.')
                     return HttpResponseRedirect("")
             else:
                 form = OrderModelForm(request.POST)
