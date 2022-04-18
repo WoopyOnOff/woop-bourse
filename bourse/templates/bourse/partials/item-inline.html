@@ -1,0 +1,30 @@
+
+
+
+<tr>
+    <td>{{ object.name }}</td>
+    <td>{{ object.price }}</td>
+    <td>{% if object.is_sold %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
+    <td>{% if object.is_sold %}{{object.sold_date}}{% else %}-{% endif %}</td>
+
+    <td><button class="btn btn-primary" 
+            hx-get="{{ object.get_hx_edit_url }}"
+            hx-trigger="edit"
+            _="on click
+                if .editing is not empty
+                Swal.fire({title: 'Already Editing', 
+                            showCancelButton: true,
+                            confirmButtonText: 'Yep, Edit This Row!',
+                            text:'Hey!  You are already editing a row!  Do you want to cancel that edit and continue?'})
+                if the result's isConfirmed is false
+                    halt
+                end
+                send cancel to .editing
+                end
+                trigger edit">
+        Edit
+        </button>
+    </td>
+    <td><button class="btn btn-danger" hx-delete="{{ object.get_delete_url }}" hx-swap='outerHTML'>Delete</button></td>
+    
+</tr>

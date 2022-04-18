@@ -1,0 +1,50 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+<style>
+    .ingredient-form {
+        border-bottom: 1px solid black;
+    }
+    .hidden {
+        display: none
+    }
+</style>
+
+<div class='row'>
+        <div class='{% if object.id %}col-12 col-md-8 {% else %} col-md-6 mx-auto {% endif %}'>
+            {% if not object.id %}
+                <h1>Gestion de ma Liste</h1>
+            {% endif %}
+
+            {% include 'bourse/partials/forms.html' %}
+        </div>
+
+        <table class="table table-striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Libellé</th>
+                    <th scope="col">Prix de vente</th>
+                    <th scope="col">Jeu vendu ?</th>
+                    <th scope="col">Date vente</th>
+                    {% if object.is_editable and object.event_status == 1 %}
+                    <th scope="col">Éditer</th>
+                    <th scope="col">Supprimer</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody hx-target="closest tr" hx-swap="outerHTML swap:1s">
+                {% for item in object.item_set_sorted %}
+                    {% include 'bourse/partials/item-inline.html' with object=item %}
+                {% endfor %}
+                {% if object.event_status > 1 %}
+                    <tr><td colspan="2">Nombre jeux vendus :</td><td>{{nb_sold}}</td><td></td></tr>
+                    <tr><td colspan="2">Total commission exclue :</td><td>{{total_vente}}</td><td></td></tr>
+                {% endif %}
+            </tbody>
+        </table>
+        <button hx-get="{{ new_item_url }}" hx-trigger='click'
+                hx-target='#items-list' hx-swap='beforeend'>Ajouter un jeu</button>
+
+</div>
+{% endblock content %}

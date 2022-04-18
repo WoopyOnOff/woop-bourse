@@ -70,6 +70,18 @@ class Item(models.Model):
     def code(self):
         item_code = str(self.pk) + ' - ' + self.name
         return item_code
+    def get_delete_url(self):
+        kwargs = {
+            "list_id": self.list.id,
+            "id": self.id
+        }
+        return reverse("bourse:item-delete", kwargs=kwargs)
+    def get_hx_edit_url(self):
+        kwargs = {
+            "list_id": self.list.id,
+            "id": self.id
+        }
+        return reverse("bourse:hx-item-detail", kwargs=kwargs)
 
 class Order(models.Model):
     # Modele des bons de vente

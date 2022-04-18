@@ -1,6 +1,6 @@
 # Django Imports
 from django.shortcuts import get_object_or_404,render,redirect
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, FileResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, FileResponse, Http404
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
@@ -154,6 +154,106 @@ class ItemDelete(LoginRequiredMixin,DeleteView):
             return HttpResponseRedirect(url)
         else:
             return super(ItemDelete, self).post(request, *args, **kwargs)
+
+#######################################
+### Htmx sur les listes utilisateur ###
+#######################################
+
+@login_required
+def list_detail_view(request, id=None):
+    hx_url = reverse("bourse:hx-detail", kwargs={"id": id})
+    context = {
+        "hx_url": hx_url
+    }
+    return render(request, "bourse/detail.html", context) 
+
+@login_required
+def list_update_view(request, id=None):
+    obj = get_object_or_404(UserList, id=id, user=request.user)
+    # form = RecipeForm(request.POST or None, instance=obj)
+    new_item_url = reverse("bourse:hx-item-create", kwargs={"list_id": obj.id})
+    context = {
+        # "#form": form,
+        "object": obj,
+        "new_item_url": new_item_url
+    }
+    # if form.is_valid():
+    #     form.save()
+    #     context['message'] = 'Data saved.'
+    if request.htmx:
+        return render(request, "bourse/partials/forms.html", context)
+    return render(request, "bourse/list-create-update.html", context)  
+
+@login_required
+def list_detail_hx_view(request, id=None):
+    if not request.htmx:
+        raise Http404
+    try:
+        obj = UserList.objects.get(id=id, user=request.user)
+    except:
+        obj = None
+    if obj is None:
+        return HttpResponse("Not found.")
+    context = {
+        "object": obj
+    }
+    return render(request, "bourse/partials/list-detail.html", context)
+
+@login_required
+def list_item_update_hx_view(request, list_id=None, id=None):
+    if not request.htmx:
+        raise Http404
+    try:
+        parent_obj = UserList.objects.get(id=list_id, user=request.user)
+    except:
+        parent_obj = None
+    if parent_obj is  None:
+        return HttpResponse("Not found.")
+    instance = None
+    if id is not None:
+        try:
+            instance = Item.objects.get(list=parent_obj, id=id)
+        except:
+            instance = None
+    form = ItemForm(request.POST or None, instance=instance)
+    url = reverse("bourse:hx-item-create", kwargs={"list_id": parent_obj.id})
+    if instance:
+        url = instance.get_hx_edit_url()
+    context = {
+        "url": url,
+        "form": form,
+        "object": instance
+    }
+    if form.is_valid():
+        new_obj = form.save(commit=False)
+        if instance is None:
+            new_obj.list = parent_obj
+        new_obj.save()
+        context['object'] = new_obj
+        return render(request, "bourse/partials/item-inline.html", context) 
+    return render(request, "bourse/partials/item-form.html", context) 
+
+@login_required
+def list_item_delete_view(request, list_id=None, id=None):
+    try:
+        obj = Item.objects.get(list__id=list_id, id=id, list__user=request.user)
+    except:
+        obj = None
+    if obj is None:
+        if request.htmx:
+            return HttpResponse("Not Found")
+        raise Http404
+    if request.method == "POST":
+        name = obj.name
+        obj.delete()
+        success_url = reverse('bourse:mylist-detail', kwargs={"id": list_id})
+        if request.htmx:
+            return render(request, "bourse/partials/item-inline-delete-response.html", {"name": name})
+        return redirect(success_url)
+    context = {
+        "object": obj
+    }
+    return render(request, "bourse/delete.html", context)
 
 ######################
 ### Administration ###

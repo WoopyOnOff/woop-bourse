@@ -29,9 +29,17 @@ urlpatterns = [
     # Ajout d'un élément à la liste
     path('mylist/<int:list_id>/item/create',views.ItemCreate.as_view(),name='add-item-to-list'),
     # Suppression d'un élément de la liste
-    path('mylist/<int:list_id>/item/<int:pk>/delete/',views.ItemDelete.as_view(),name='del-item-from-list'),
+    #path('mylist/<int:list_id>/item/<int:pk>/delete/',views.ItemDelete.as_view(),name='del-item-from-list'),
     # Mise à jour d'un élément de la liste
     path('mylist/<int:list_id>/item/<int:pk>/update/',views.ItemUpdate.as_view(),name='edit-item-from-list'),
+    # Htmx
+    path("mylist/<int:id>/", views.list_detail_view, name='mylist-detail'),
+    path("mylist/<int:id>/edit/", views.list_update_view, name='my-list-update'),
+    path("mylist/<int:list_id>/item/<int:id>/delete/", views.list_item_delete_view, name='item-delete'),
+
+    path("mylist-hx/<int:list_id>/item/<int:id>/", views.list_item_update_hx_view, name='hx-item-detail'),
+    path("mylist-hx/<int:list_id>/item/", views.list_item_update_hx_view, name='hx-item-create'),
+    path("mylist-hx/<int:id>/", views.list_detail_hx_view, name='hx-detail'),
 
     ### Administration
     # Dashboard de l'événement
