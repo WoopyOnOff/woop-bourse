@@ -51,6 +51,7 @@ class ProfileUpdate(LoginRequiredMixin,SuccessMessageMixin,UpdateView):
 
 class EventListView(generic.ListView):
     model = Event
+    ordering = ['-event_date']
 
 class EventDetailView(generic.DetailView):
     model = Event
