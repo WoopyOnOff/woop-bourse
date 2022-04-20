@@ -74,6 +74,7 @@ TEMPLATES = [
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
                 'bourse.context_processors.site_params',
+                'bourse.context_processors.active_event',
             ],
         },
     },
@@ -155,6 +156,7 @@ EMAIL_PORT = '<yourPort>'
 EMAIL_HOST_USER = '<YourUser>'
 EMAIL_HOST_PASSWORD = '<YourPassword>'
 EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = '"do_not_reply" <do_not_reply@example.com>'
 
 # CRISPY_FORMS_CONF
 CRISPY_TEMPLATE_PACK = 'bootstrap4'
