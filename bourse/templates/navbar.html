@@ -1,0 +1,59 @@
+{% url 'bourse:index' as home_url %}
+{% url 'bourse:events' as events_url %}
+{% url 'bourse:my-lists' as mylists_url %}
+{% url 'django_registration_register' as register_url %}
+{% url 'login' as login_url %}
+{% url 'bourse:profile-edit' user.pk as profile_url %}
+{% url 'logout' as logout_url %}
+{% url 'admin:index' as admin_url %}
+{% url 'bourse:admin-dashboard' active_event.pk as dashboard_url %}
+<!-- Fixed navbar -->
+<nav class="navbar navbar-expand-md navbar-dark fixed-top bg-dark">
+    <a class="navbar-brand" href="{{ home_url }}">Woopy On Off</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarCollapse" aria-controls="navbarCollapse" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse order-1 order-md-0 dual-collapse2" id="navbarCollapse" >
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item {% if request.path == home_url %} active {%endif%}">
+          <a class="nav-link" href="{{ home_url }}">Accueil <span class="sr-only">(current)</span></a>
+        </li>
+        <li class="nav-item {% if request.path == events_url %} active {%endif%}">
+          <a class="nav-link" href="{{ events_url }}">Les événements</a>
+        </li>
+        {% if user.is_authenticated %}
+        <li class="nav-item {% if request.path == mylists_url %} active {%endif%}">
+          <a class="nav-link" href="{{ mylists_url }}">Mes listes</a>
+        </li>
+        {% endif %}
+      </ul>
+      <ul class="navbar-nav ml-auto">
+        {% if not user.is_authenticated %}
+          <li class="nav-item {% if request.path == register_url %} active {%endif%}">
+            <a class="nav-link" href="{{ register_url }}">S'inscrire</a>
+          </li>
+          <li class="nav-item {% if request.path == login_url %} active {%endif%}">
+            <a class="nav-link" href="{% url 'login' %}?next={{ home_url }}">Se connecter</a>
+          </li>
+        {% else %}
+          {% if user.is_staff %}
+            {% for event in active_event %}
+            {% url 'bourse:admin-dashboard' event.pk as dashboard_url %}
+            <li class="nav-item {% if request.path == dashboard_url %} active {%endif%}">
+              <a class="nav-link" href="{{ dashboard_url }}">Dashboard Bourse {{ event.date_only }}</a>
+            </li>
+            {% endfor %}
+            <li class="nav-item {% if request.path == admin_url %} active {%endif%}">
+              <a class="nav-link" href="{{ admin_url }}">Admin Django</a>
+            </li>
+          {% endif %}
+          <li class="nav-item {% if request.path == profile_url %} active {%endif%}">
+            <a class="nav-link" href="{{ profile_url }}">Mon compte ({{ user.get_username }})</a>
+          </li>
+          <li class="nav-item {% if request.path == logout_url %} active {%endif%}">
+            <a class="nav-link" href="{{ logout_url }}">Se déconnecter</a>
+          </li>
+        {% endif %}
+        </ul> 
+    </div>
+  </nav>

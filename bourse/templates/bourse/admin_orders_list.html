@@ -1,0 +1,31 @@
+{% extends "base_generic.html" %}
+{% block content %}
+<h2>Liste des commandes :</h2>
+    {% if order_list %}
+    <table class="table table-striped">
+        <thead class="thead-dark">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Date de Création</th>
+            <th scope="col">Validée</th>
+            <th scope="col">Détail</th>
+            <th scope="col">Facture</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% for order in order_list %}
+            <tr>
+                <th scope="row">{{order.pk}}</th>
+                <td>{{ order.created_date }}</td>
+                <td>{% if order.is_validated %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
+                <td><a href="{% url 'bourse:admin-ordermanage' view.kwargs.event_id order.pk %}">Détail</a></td>
+                <td>{% if order.is_validated %}<a href="{% url 'bourse:admin-order-pre-invoice-form' view.kwargs.event_id order.pk %}">PDF</a>{% endif %}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+        <p>Il n'y a actuellement aucune commande.</p>
+    {% endif %}
+    <a href="{% url 'bourse:admin-dashboard' view.kwargs.event_id %}">Retour Dashboard</a>
+{% endblock %}

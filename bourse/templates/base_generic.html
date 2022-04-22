@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  {% block title %}<title>{{ SITE_TITLE_SETTING }}</title>{% endblock %}
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="theme-color" content="#563d7c">
+  {% load i18n bootstrap4 %}
+  {% bootstrap_css %}
+  <!-- Add additional CSS in static file -->
+  {% load static %}
+  <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{% static 'img/apple-touch-icon-180x180.png' %}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{% static 'img/favicon-32x32.png' %}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{% static 'img/favicon-16x16.png' %}">
+  <style>
+    .bd-placeholder-img {
+      font-size: 1.125rem;
+      text-anchor: middle;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+      user-select: none;
+    }
+
+    @media (min-width: 768px) {
+      .bd-placeholder-img-lg {
+        font-size: 3.5rem;
+      }
+    }
+  </style>
+  <script src="{% static 'js/htmx.min.js' %}" defer></script>
+</head>
+<body class="d-flex flex-column h-100">
+<!-- Page Header -->
+<header>
+  {% include 'navbar.html' %}
+</header>
+<!-- Begin page content -->
+<main role="main" class="flex-shrink-0">
+  <div class="container">
+    {% for message in messages %}
+    <div class="{{ message|bootstrap_message_classes }} alert-dismissible fade show" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="{% trans 'close' %}">&#215;</button>
+        {{ message }}
+    </div>
+    {% endfor %}
+    {% block content %}{% endblock %}
+  </div>
+</main>
+<!-- Page Footer -->
+<footer class="footer fixed-bottom py-3">
+  <div class="container">
+    <span class="text-muted">{{ SITE_SIGNATURE_SETTING }}</span>
+  </div>
+</footer>
+<!-- Javascript -->
+{% bootstrap_javascript jquery='full' %}
+{% block custom_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,11 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+
+{% if index_content %}
+    {{ index_content.content|safe }}
+{% else %}
+    <h3>Il faut ajouter une page avec pour titre « Accueil » dans l'admin Django.</h3>
+{% endif %}
+
+{% endblock %}

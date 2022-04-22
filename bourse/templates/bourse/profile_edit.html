@@ -1,0 +1,13 @@
+{% extends "base_generic.html" %}
+{% load crispy_forms_tags %}
+{% block content %}
+<h2>Mon profil</h2>
+  <form action="" method="post">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+  </form>
+<p></p>
+<h5>Autre action :</h5>
+<p><a href="{% url 'password_change' %}">Changer de mot de passe.</a></p>
+{% endblock %}

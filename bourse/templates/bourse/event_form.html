@@ -1,0 +1,14 @@
+{% extends "base_generic.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h2>Événement « {{ event.event_name }} du {{ event.date_only }} »</h2>
+  <p>Modification du statut de l'événement :</p>
+  <form action="" method="post">
+    {% csrf_token %}
+    <table>
+    {{ form|crispy }}
+    </table>
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+  </form>
+{% endblock %}

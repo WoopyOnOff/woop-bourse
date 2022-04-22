@@ -1,0 +1,23 @@
+{% extends "base_generic.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h2>Commande</h2>
+<h4>ID : {{ order.pk }} - Date de création : {{ order.created_date }}</h4>
+
+{% if not order.is_validated %}
+<p>Il faut valider la commande pour pouvoir éditer une facture.</p>
+
+{% else %}
+<div class="col-6">
+<form action="" method="POST">
+    {% csrf_token %}
+    {{ form|crispy }}
+    <button type="submit" name="validate" class="btn btn-primary">Générer la facture.</button>
+    <button type="submit" formnovalidate name="cancel" class="btn btn-primary">Retour</button>
+</form>
+<p></p>
+</div>
+{% endif %}
+
+{% endblock %}

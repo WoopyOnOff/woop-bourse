@@ -1,0 +1,13 @@
+{% extends "base_generic.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h2>Ma liste {{ userlist.list_label }}</h2>
+  <form action="" method="post">
+    {% csrf_token %}
+    <table>
+    {{ form|crispy }}
+    </table>
+    <button type="submit" class="btn btn-primary">Enregistrer</button>
+  </form>
+{% endblock %}

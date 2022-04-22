@@ -1,0 +1,7 @@
+{% extends "base_generic.html" %}
+
+{% block content %}
+<h2>L'activation a échouée.</h2>
+<p>Tout n'est pas perdu, certains hébergeurs de boîte mail visitent les liens avant que vous ne cliquiez dessus.</p>
+<p>Votre compte est peut-être tout simplement déjà actif, essayez de <a href="{% url 'login'%}">vous connecter.</a></p>
+{% endblock %}
