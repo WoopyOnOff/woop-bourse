@@ -24,10 +24,19 @@ from .printing import MyPrint
 ### Index ###
 #############
 def index(request):
-    # opened_registration_event = Event.objects.filter(status=1)
-    index_content = get_object_or_404(Page,title='Accueil')
+    index_content = get_object_or_404(Page,slug='home')
     context = {
         # 'opened_registration_event': opened_registration_event,
+        'index_content': index_content,
+    }
+    return render(request, 'index.html', context=context)
+
+#############
+### Pages ###
+#############
+def pages(request, slug):
+    index_content = get_object_or_404(Page,slug=slug)
+    context = {
         'index_content': index_content,
     }
     return render(request, 'index.html', context=context)

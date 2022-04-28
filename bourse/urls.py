@@ -6,6 +6,7 @@ app_name = 'bourse'
 urlpatterns = [
     ### Index
     path('', views.index, name='index'),
+    path('p/<slug:slug>/', views.pages, name='page-view'),
 
     ### Événements
     # Liste des événements
