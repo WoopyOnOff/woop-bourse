@@ -90,6 +90,7 @@ class OrderItem(models.Model):
 
 class Page(models.Model):
     title = models.CharField(max_length=50)
+    slug = models.CharField(max_length=50,blank=True,null=True)
     content = RichTextField()
     timestamp = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
