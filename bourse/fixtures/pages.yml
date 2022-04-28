@@ -1,6 +1,0 @@
----
-- model: bourse.page
-  pk: 1
-  fields:
-    title: "Accueil"
-    content: "<h1>Modifier le contenu dans l'admin</h1>"
