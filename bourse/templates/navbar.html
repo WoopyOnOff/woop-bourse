@@ -1,6 +1,8 @@
 {% url 'bourse:index' as home_url %}
 {% url 'bourse:events' as events_url %}
 {% url 'bourse:my-lists' as mylists_url %}
+{% url 'bourse:page-view' 'rules' as rules_url %}
+{% url 'bourse:page-view' 'about' as about_url %}
 {% url 'django_registration_register' as register_url %}
 {% url 'login' as login_url %}
 {% url 'bourse:profile-edit' user.pk as profile_url %}
@@ -25,7 +27,13 @@
         <li class="nav-item {% if request.path == mylists_url %} active {%endif%}">
           <a class="nav-link" href="{{ mylists_url }}">Mes listes</a>
         </li>
+        <li class="nav-item {% if request.path == rules_url %} active {%endif%}">
+          <a class="nav-link" href="{{ rules_url }}">Règlement</a>
+        </li>
         {% endif %}
+        <li class="nav-item {% if request.path == about_url %} active {%endif%}">
+          <a class="nav-link" href="{{ about_url }}">À Propos</a>
+        </li>
       </ul>
       <ul class="navbar-nav ml-auto">
         {% if not user.is_authenticated %}
