@@ -8,7 +8,6 @@ from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMix
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
-from django.db.models import Sum
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
 
@@ -48,8 +47,10 @@ class ProfileUpdate(LoginRequiredMixin,SuccessMessageMixin,UpdateView):
     model = User
     form_class = UserForm
     template_name = 'bourse/profile_edit.html'
-    success_message = "Profil mis a jour."
+    success_message = _("Profil mis a jour.")
     def get_queryset(self):
+        if self.request.user.first_name == '' or self.request.user.last_name == '':
+            messages.add_message(self.request, messages.WARNING, _("Votre nom n'est pas renseigné."))
         return User.objects.filter(pk=self.request.user.id)
     def get_success_url(self):
         return reverse('bourse:profile-edit',kwargs={'pk':self.object.pk})
@@ -104,7 +105,7 @@ def ListValidate(request,pk):
     success_url = redirect('bourse:my-list-view',list_instance.pk)
     if request.method == 'POST':
         if "cancel" in request.POST:
-            messages.warning(request, 'Votre liste n\'a pas été validée.')
+            messages.warning(request, _('Votre liste n\'a pas été validée.'))
             return success_url
         else:
             form = ListValidateForm(request.POST)
@@ -112,7 +113,7 @@ def ListValidate(request,pk):
                 list_instance.list_status = 2
                 list_instance.validated_date = datetime.datetime.now()
                 list_instance.save()
-                messages.success(request, 'Votre liste est validée.')
+                messages.success(request, _('Votre liste est validée.'))
                 return success_url
     else:
         form = ListValidateForm()
@@ -135,7 +136,7 @@ class ItemCreate(LoginRequiredMixin,CreateView):
         self.object.list_id = self.kwargs.get('list_id', None)
         if UserList.objects.filter(user=self.request.user,id=self.object.list_id,list_status=1,event__status=1):
             self.object.save()
-            messages.success(self.request, 'Jeu %s correctement ajouté.' % self.object.name)
+            messages.success(self.request, _('Jeu %s correctement ajouté.' % self.object.name))
             return redirect('bourse:my-list-view',self.object.list_id)
         else:
             return HttpResponseForbidden()
@@ -152,7 +153,7 @@ class ItemUpdate(LoginRequiredMixin,UpdateView):
         self.object.list_id = self.kwargs.get('list_id', None)
         if UserList.objects.filter(user=self.request.user,id=self.object.list_id,list_status=1,event__status=1):
             self.object.save()
-            messages.success(self.request, 'Jeu %s mis à jour.' % self.object.name)
+            messages.success(self.request, _('Jeu %s mis à jour.' % self.object.name))
             return redirect('bourse:my-list-view',self.object.list_id)
         else:
             return HttpResponseForbidden()
@@ -163,11 +164,11 @@ class ItemDelete(LoginRequiredMixin,DeleteView):
     def get_queryset(self):
         return Item.objects.filter(id=self.kwargs.get('pk'),list__user=self.request.user,list__list_status=1,list__event__status=1)
     def get_success_url(self):
-        messages.success(self.request, 'Le jeu %s est supprimé.' % self.object.name)
+        messages.success(self.request, _('Le jeu %s est supprimé.' % self.object.name))
         return reverse_lazy('bourse:my-list-view',kwargs={'pk':self.kwargs.get('list_id')})
     def post(self, request, *args, **kwargs):
         if "cancel" in request.POST:
-            messages.warning(request, 'Le jeu n\'a pas été supprimé.')
+            messages.warning(request, _('Le jeu n\'a pas été supprimé.'))
             return redirect('bourse:my-list-view',self.kwargs.get('list_id'))
         else:
             return super(ItemDelete, self).post(request, *args, **kwargs)
