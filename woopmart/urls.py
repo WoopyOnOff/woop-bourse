@@ -20,7 +20,8 @@ from django.urls import include,path
 #from django.conf import settings
 #from django.conf.urls.static import static
 from django_registration.forms import RegistrationFormUniqueEmail
-from django_registration.views import RegistrationView
+from django_registration.backends.activation.views import RegistrationView
+#from django_registration.views import RegistrationView
 
 urlpatterns = [
     path('',RedirectView.as_view(url='bourse/',permanent=True)), # Redirection vers bourse/
