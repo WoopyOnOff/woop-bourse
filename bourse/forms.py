@@ -7,9 +7,11 @@ from django.contrib.auth.models import User
 from .models import Item, UserList, Event, Order, OrderItem
 
 class UserForm(forms.ModelForm):
+    first_name = forms.CharField(max_length=50,label=_('Prénom')) # Required
+    last_name = forms.CharField(max_length=50,label=_('Nom')) # Required
     class Meta:
         model = User
-        fields = ['first_name','last_name','email']
+        fields = ['first_name','last_name','email'] 
 
 class ItemForm(forms.ModelForm):
     name = forms.CharField(label='Nom du jeu')
