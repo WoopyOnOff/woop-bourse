@@ -22,12 +22,14 @@ from django.urls import include,path
 from django_registration.forms import RegistrationFormUniqueEmail
 from django_registration.backends.activation.views import RegistrationView
 #from django_registration.views import RegistrationView
+from .forms import CustomRegistrationForm
 
 urlpatterns = [
     path('',RedirectView.as_view(url='bourse/',permanent=True)), # Redirection vers bourse/
     path('admin/', admin.site.urls),
     path('bourse/', include('bourse.urls')),
-    path('accounts/register/',RegistrationView.as_view(form_class=RegistrationFormUniqueEmail),name='django_registration_register'),
+    #path('accounts/register/',RegistrationView.as_view(form_class=RegistrationFormUniqueEmail),name='django_registration_register'),
+    path('accounts/register/',RegistrationView.as_view(form_class=CustomRegistrationForm),name='django_registration_register'),
     path('accounts/', include('django_registration.backends.activation.urls')),
     path('accounts/', include('django.contrib.auth.urls')),
     # path('accounts/login', views.LoginView.as_view(), name='login'),
