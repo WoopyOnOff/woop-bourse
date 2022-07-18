@@ -92,7 +92,7 @@ class MyPrint:
                 # Vertical line
                 if not post:
                     self.c.setLineWidth(0.5)
-                    self.c.line(18*cm,0,18*cm,self.height)
+                    self.c.line(17.5*cm,0,17.5*cm,self.height)
                 # Init Tabs
                 table_data = []
                 price_tags_data = []
@@ -156,14 +156,14 @@ class MyPrint:
                     item_table.setStyle(TableStyle([('TEXTCOLOR', (0, 0), (-3, -1), my_black),('TEXTCOLOR', (0, 0), (-1, 0), my_black)]))
                 # Affichage du tableau
                 item_table.wrapOn(self.c, 15*cm, 18*cm)
-                item_table.drawOn(self.c, *self.coord(2,5+0.6*len(table_data),cm))
+                item_table.drawOn(self.c, *self.coord(2,9+0.6*len(table_data),cm))
                 # Create the price tags table
                 if not post:
                     price_tags_table = Table(price_tags_data,colWidths=[3*cm])
                     rowNumb = len(price_tags_data)
                     for r in range(0, rowNumb):
                         if r%3 == 0:
-                            price_tags_table.setStyle(TableStyle([('BOX',(0,r),(-1,r+2),0.5,my_black),
+                            price_tags_table.setStyle(TableStyle([('LINEABOVE',(0,r),(-1,r+2),0.5,my_black),
                                                                 ('TOPPADDING',(0,r),(-1,r),0),
                                                                 ('BOTTOMPADDING',(0,r),(-1,r),-0)]))
                         elif r%3 == 1:
@@ -174,13 +174,14 @@ class MyPrint:
                                                                 ('FONTSIZE',(0,r),(-1,r),6)]))
                         else:
                             price_tags_table.setStyle(TableStyle([('LINEABOVE',(0,r),(-1,r),0.5,my_grey),
+                                                                ('LINEBELOW',(0,r),(-1,r),0.5,my_black),
                                                                 ('FONTSIZE',(0,r),(-1,r),18),
                                                                 ('TOPPADDING',(0,r),(-1,r),0),
                                                                 ('BOTTOMPADDING',(0,r),(-1,r),10),
                                                                 ('ALIGN',(0,r),(-1,r),'RIGHT'),
                                                                 ('VALIGN',(0,r),(-1,r),'MIDDLE')]))
-                    price_tags_table.wrapOn(self.c, 3*cm, 3*cm)
-                    price_tags_table.drawOn(self.c, *self.coord(18,28,cm))
+                    price_tags_table.wrapOn(self.c, 3.5*cm, 3*cm)
+                    price_tags_table.drawOn(self.c, *self.coord(17.5,28,cm))
                 # Pages
                 pages_label = Paragraph('page ' + str(page_cur) + ' sur ' + str(ceil(len(user_list_items)/nbMaxLinesPerPage)),my_bodytext)
                 pages_label.wrapOn(self.c,5*cm,1*cm)
