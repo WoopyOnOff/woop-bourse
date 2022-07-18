@@ -17,7 +17,7 @@ class Event(models.Model):
     status = models.IntegerField('Event Status',default=2,choices=STATUSES)
     comments = RichTextField()
     def __str__(self):
-        return self.event_name
+        return self.event_name + ' - ' + _date(self.event_date,'d F Y')
     def get_absolute_url(self):
         return reverse('bourse:event-detail', kwargs={"pk": self.id})
     def date_only(self):
@@ -77,7 +77,7 @@ class Order(models.Model):
     created_date = models.DateTimeField('Date Created', auto_now_add=True)
     is_validated = models.BooleanField('Order Validated',default=False)
     def __str__(self):
-        return self.event.event_name + ' - ' + str(self.pk) + ' - ' + _date(self.created_date,'d/m/Y H:i:s')
+        return str(self.pk) + ' - ' + self.event.event_name + ' - ' + _date(self.created_date,'d/m/Y H:i:s')
 
 class OrderItem(models.Model):
     # Modele des elements (jeux) des bons de vente
