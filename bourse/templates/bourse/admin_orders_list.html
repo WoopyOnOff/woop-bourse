@@ -27,5 +27,8 @@
     {% else %}
         <p>Il n'y a actuellement aucune commande.</p>
     {% endif %}
-    <a href="{% url 'bourse:admin-dashboard' view.kwargs.event_id %}">Retour Dashboard</a>
+    <p>
+        <a class="btn btn-primary" href="{% url 'bourse:admin-dashboard' view.kwargs.event_id %}" role="button">Retour Dashboard</a>
+        <a class="btn btn-primary" href="{% url 'bourse:admin-ordercreate' view.kwargs.event_id %}" role="button">Créer une Commande</a>
+    </p>
 {% endblock %}
