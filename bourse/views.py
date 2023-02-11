@@ -327,10 +327,10 @@ def OrderDetailValidate(request,event_id,order_id):
                         item = Item.objects.get(pk=order_item_pk)
                         OrderItem.objects.create(order=order,item=item)
                     messages.success(request, 'Le jeu « %s » est ajouté.' % item.name)
-                    return HttpResponseRedirect("")
+                    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
                 else:
                     messages.error(request, 'Problème à l\'ajout du jeu.')
-                    return HttpResponseRedirect("")
+                    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
             else:
                 form = OrderModelForm(request.POST)
                 if form.is_valid():
@@ -385,7 +385,6 @@ def OrderPreInvoicePdfGen(request,event_id,order_id):
     order = get_object_or_404(Order,pk=order_id,event=event_id)
     order_items = OrderItem.objects.filter(order=order_id)
     cancel_url = redirect('bourse:admin-orders',event_id)
-    #success_url = redirect('admin-order-invoice-pdf',event_id,order_id)
     filename = 'EVT_' + str(event_id) + '_INVOICE_'+ str(order_id) + '.pdf'
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=' + filename
@@ -401,8 +400,6 @@ def OrderPreInvoicePdfGen(request,event_id,order_id):
                     pdf = report.createInvoice(event,order,order_items,form.cleaned_data)
                     response.write(pdf)
                     return response
-                    ##OrderDetailPdfGen(request,event_id,order_id,self.data) # TO DO
-                    ##return HttpResponseRedirect(reverse_lazy('admin-order-invoice-pdf',kwargs={'event_id':event_id,'order_id':order_id}))
         else:
             form = InvoiceClientForm()
             context = { 

@@ -30,7 +30,7 @@
         <tr>
             <th scope="row">{{item.item.pk}}</th>
             <td>{{ item.item.name }}</td>
-            <td align="right">{{ item.item.price }}</td>
+            <td align="right">{{ item.item.price }} {{ SITE_CURRENCY_SETTING }}</td>
             <td>{% if not order.is_validated %}<a href="{% url 'bourse:admin-order-item-delete' event_id order.pk item.pk %}">Supprimer</a>{% endif %}</td>
         </tr>
     {% endfor %}
