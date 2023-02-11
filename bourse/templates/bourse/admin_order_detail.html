@@ -30,12 +30,14 @@
         <tr>
             <th scope="row">{{item.item.pk}}</th>
             <td>{{ item.item.name }}</td>
-            <td>{{ item.item.price }}</td>
+            <td align="right">{{ item.item.price }}</td>
             <td>{% if not order.is_validated %}<a href="{% url 'bourse:admin-order-item-delete' event_id order.pk item.pk %}">Supprimer</a>{% endif %}</td>
         </tr>
     {% endfor %}
-        <tr><th scope="row" colspan="2">{{ nb_items }} Jeu{% if nb_items > 1 %}x{% endif %} - Total vente :</th><th scope="row">{{order_total}} {{ SITE_CURRENCY_SETTING }}</th><td></td></tr>
     </tbody>
+    <tfoot>
+        <tr><td colspan="2">{{ nb_items }} Jeu{% if nb_items > 1 %}x{% endif %} - Total vente :</td><td align="right">{{order_total}} {{ SITE_CURRENCY_SETTING }}</td><td></td></tr>
+    </tfoot>
 </table>
 
 <form action="" method="post">

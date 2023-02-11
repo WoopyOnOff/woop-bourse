@@ -12,7 +12,7 @@
 
 <table class="table table-striped">
     <thead class="thead-dark">
-        <tr>
+        <tr align="center">
             <th scope="col">Libellé</th>
             <th scope="col">Prix de vente</th>
             <th scope="col">Jeu vendu ?</th>
@@ -26,19 +26,22 @@
         {% for item in userlist.item_set_sorted %}
         <tr>
             <td>{{item.name}}</td>
-            <td>{{item.price}}</td>
-            <td>{% if item.is_sold %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
+            <td align="right">{{item.price}}</td>
+            <td align="center">{% if item.is_sold %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
             <td>{% if item.is_sold %}{{item.sold_date}}{% else %}-{% endif %}</td>
             {% if userlist.is_editable and userlist.event_status == 1 %}
             <td><a href="{% url 'bourse:edit-item-from-list' userlist.pk item.pk %}">Éditer</a> / <a href="{% url 'bourse:del-item-from-list' userlist.pk item.pk %}">Supprimer</a></td>
             {% endif %}
         </tr>
         {% endfor %}
-        {% if userlist.event_status > 1 %}
-            <tr><td colspan="2">Nombre jeux vendus :</td><td>{{nb_sold}}</td><td></td></tr>
-            <tr><td colspan="2">Total commission exclue :</td><td>{{total_vente}}</td><td></td></tr>
-        {% endif %}
     </tbody>
+    <tfoot>
+        <tr><td>Nombre jeux :</td><td align="right">{{userlist.nb_items}}</td><td></td><td></td></tr>
+        {% if userlist.event_status > 1 %}
+        <tr><td colspan="2">Nombre jeux vendus :</td><td align="right">{{userlist.nb_sold}}</td><td></td></tr>
+        <tr><td colspan="2">Total commission exclue :</td><td align="right">{{userlist.total_vente}}</td><td></td></tr>
+        {% endif %}
+    </tfoot>
 </table>
 
 {% if userlist.is_editable and userlist.event_status == 1 %}

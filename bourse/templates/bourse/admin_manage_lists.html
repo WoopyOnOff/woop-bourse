@@ -24,7 +24,7 @@
     {% else %}
     <tr>
     {% endif %}
-      <td>{{ list.user.pk }}</td>
+      <td align="right">{{ list.user.pk }}</td>
       <td>{{ list.user.last_name }}</td>
       <td>{{ list.user.first_name }}</td>
       <td>{{ list.user.username }}</td>
@@ -33,8 +33,8 @@
         {% if list.list_status == 2 or list.list_status == 3 %} (<a href="{% url 'bourse:admin-list-validate' list.event.pk list.pk %}">Modifier</a>)
         {% endif %}
       </td>
-      <td>{{ list.nb_items }}</td>
-      <td>{{ list.nb_sold }}</td>
+      <td align="right">{{ list.nb_items }}</td>
+      <td align="right">{{ list.nb_sold }}</td>
       <td>{{ list.validated_date }}</td>
       <td>
         {% if list.list_status == 3 %} <a href="{% url 'bourse:admin-list-pdf' list.event.pk list.pk 'pre' %}">PDF Complet</a>
@@ -46,5 +46,5 @@
   {% endfor %}
   </tbody>
 </table>
-<a href="{% url 'bourse:admin-dashboard' view.kwargs.pk %}">Retour Dashboard</a>
+<p><a class="btn btn-primary" href="{% url 'bourse:admin-dashboard' view.kwargs.pk %}" role="button">Retour Dashboard</a></p>
 {% endblock %}

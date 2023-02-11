@@ -51,7 +51,7 @@ class UserList(models.Model):
         val = self.LIST_STATUSES[( self.list_status - 1 )][1]
         return val
     def item_set_sorted(self):
-        return self.item_set.all().order_by('-created_date')
+        return self.list_items.all().order_by('-created_date')
     def get_absolute_url(self):
         return reverse('bourse:my-list-view',kwargs={"pk": self.id})
     def __str__(self):

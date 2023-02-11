@@ -4,7 +4,7 @@
     {% if page_obj %}
     <table class="table table-striped">
         <thead class="thead-dark">
-          <tr>
+          <tr align="center">
             <th scope="col">#</th>
             <th scope="col">Date de Création</th>
             <th scope="col">Validée</th>
@@ -16,12 +16,12 @@
         </thead>
         <tbody>
         {% for order in page_obj %}
-            <tr>
-                <th scope="row">{{order.pk}}</th>
+            <tr align="center">
+                <th scope="row" align="right">{{order.pk}}</th>
                 <td>{{ order.created_date }}</td>
-                <td>{% if order.is_validated %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
-                <td>{{ order.nb_items }}</td>
-                <td>{{ order.total_cmd }} {{ SITE_CURRENCY_SETTING }}</td>
+                <td align="center">{% if order.is_validated %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
+                <td align="right">{{ order.nb_items }}</td>
+                <td align="right">{{ order.total_cmd }} {{ SITE_CURRENCY_SETTING }}</td>
                 <td><a href="{% url 'bourse:admin-ordermanage' view.kwargs.event_id order.pk %}">Détail</a></td>
                 <td>{% if order.is_validated %}<a href="{% url 'bourse:admin-order-pre-invoice-form' view.kwargs.event_id order.pk %}">PDF</a>{% endif %}</td>
             </tr>
