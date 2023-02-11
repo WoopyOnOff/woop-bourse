@@ -10,7 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
-from django.db.models import Count, Sum
+from django.db.models import Count, Sum, Case, When, IntegerField
 
 # Sys
 import datetime, io
@@ -231,7 +231,7 @@ class ListsListView(UserPassesTestMixin,generic.ListView):
     def test_func(self):
         return self.request.user.is_staff
     def get_queryset(self):
-        return UserList.objects.filter(event=self.kwargs.get('pk')).order_by('validated_date')
+        return UserList.objects.filter(event=self.kwargs.get('pk')).order_by('validated_date').annotate(nb_items=Count('list_items', distinct=True), nb_sold=Count(Case(When(list_items__is_sold=True, then=1),output_field=IntegerField())))
 
 # Generation de PDF de la liste de l'utilisateur
 @login_required

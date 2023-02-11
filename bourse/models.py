@@ -59,7 +59,7 @@ class UserList(models.Model):
 
 class Item(models.Model):
     # Modele des jeux appartenant aux listes
-    list = models.ForeignKey(UserList, on_delete=models.CASCADE)
+    list = models.ForeignKey(UserList, on_delete=models.CASCADE, related_name='list_items')
     name = models.CharField(max_length=100)
     price = models.IntegerField('Sold Price')
     created_date = models.DateTimeField('Date Created', auto_now_add=True)
