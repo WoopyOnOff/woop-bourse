@@ -94,7 +94,6 @@ class ListDetailByUserDetailView(LoginRequiredMixin,generic.DetailView):
         return UserList.objects.filter(user=self.request.user).order_by('created_date').annotate(
             nb_items=Count('list_items', distinct=True),
             nb_sold=Count(Case(When(list_items__is_sold=True, then=1),output_field=IntegerField())),
-            total_item_price=Sum('list_items__price'),
             total_vente=Sum(Case(When(list_items__is_sold=True, then='list_items__price')) - settings.COMMISSION)
         )
 
