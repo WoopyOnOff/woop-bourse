@@ -137,7 +137,7 @@ class ItemCreate(LoginRequiredMixin,CreateView):
         self.object.list_id = self.kwargs.get('list_id', None)
         if UserList.objects.filter(user=self.request.user,id=self.object.list_id,list_status=1,event__status=1):
             self.object.save()
-            messages.success(self.request, _('Jeu %s correctement ajouté.' % self.object.name))
+            messages.success(self.request, _('Jeu « %s » correctement ajouté.' % self.object.name))
             return redirect('bourse:my-list-view',self.object.list_id)
         else:
             return HttpResponseForbidden()
@@ -154,7 +154,7 @@ class ItemUpdate(LoginRequiredMixin,UpdateView):
         self.object.list_id = self.kwargs.get('list_id', None)
         if UserList.objects.filter(user=self.request.user,id=self.object.list_id,list_status=1,event__status=1):
             self.object.save()
-            messages.success(self.request, _('Jeu %s mis à jour.' % self.object.name))
+            messages.success(self.request, _('Jeu « %s » mis à jour.' % self.object.name))
             return redirect('bourse:my-list-view',self.object.list_id)
         else:
             return HttpResponseForbidden()
@@ -165,7 +165,7 @@ class ItemDelete(LoginRequiredMixin,DeleteView):
     def get_queryset(self):
         return Item.objects.filter(id=self.kwargs.get('pk'),list__user=self.request.user,list__list_status=1,list__event__status=1)
     def get_success_url(self):
-        messages.success(self.request, _('Le jeu %s est supprimé.' % self.object.name))
+        messages.success(self.request, _('Le jeu « %s » est supprimé.' % self.object.name))
         return reverse_lazy('bourse:my-list-view',kwargs={'pk':self.kwargs.get('list_id')})
     def post(self, request, *args, **kwargs):
         if "cancel" in request.POST:
@@ -327,7 +327,7 @@ def OrderDetailValidate(request,event_id,order_id):
                     if Item.objects.filter(pk=order_item_pk,list__list_status=3,is_sold=False,list__event=event_id).exists():
                         item = Item.objects.get(pk=order_item_pk)
                         OrderItem.objects.create(order=order,item=item)
-                    messages.success(request, 'Le jeu est ajouté.')
+                    messages.success(request, 'Le jeu « %s » est ajouté.' % item.name)
                     return HttpResponseRedirect("")
                 else:
                     messages.error(request, 'Problème à l\'ajout du jeu.')
