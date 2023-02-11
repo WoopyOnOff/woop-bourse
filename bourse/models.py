@@ -78,9 +78,6 @@ class Order(models.Model):
     is_validated = models.BooleanField('Order Validated',default=False)
     def __str__(self):
         return str(self.pk) + ' - ' + self.event.event_name + ' - ' + _date(self.created_date,'d/m/Y H:i:s')
-    # def nb_items(self):
-    #     items = self.annotate(items_count=models.Count('order_items'))
-    #     return items.items_count
 
 class OrderItem(models.Model):
     # Modele des elements (jeux) des bons de vente

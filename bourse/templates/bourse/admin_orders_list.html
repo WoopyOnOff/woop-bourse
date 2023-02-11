@@ -1,7 +1,7 @@
 {% extends "base_generic.html" %}
 {% block content %}
 <h2>Liste des commandes :</h2>
-    {% if order_list %}
+    {% if page_obj %}
     <table class="table table-striped">
         <thead class="thead-dark">
           <tr>
@@ -15,7 +15,7 @@
           </tr>
         </thead>
         <tbody>
-        {% for order in order_list %}
+        {% for order in page_obj %}
             <tr>
                 <th scope="row">{{order.pk}}</th>
                 <td>{{ order.created_date }}</td>
@@ -28,6 +28,13 @@
         {% endfor %}
         </tbody>
     </table>
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% for pnum in page_obj.paginator.page_range %}
+            {% if pnum == page_obj.number %}<li class="page-item disabled">{% else %}<li class="page-item">{% endif %}<a class="page-link" href="?page={{ pnum }}">{{ pnum }}</a></li>
+            {% endfor %}
+        </ul>
+    </nav>
     {% else %}
         <p>Il n'y a actuellement aucune commande.</p>
     {% endif %}
