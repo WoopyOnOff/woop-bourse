@@ -10,6 +10,7 @@ from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
+from django.db.models import Count, Sum
 
 # Sys
 import datetime, io
@@ -438,4 +439,4 @@ class OrdersListView(UserPassesTestMixin,generic.ListView):
     def test_func(self):
         return self.request.user.is_staff
     def get_queryset(self):
-        return Order.objects.filter(event=self.kwargs.get('event_id')).order_by('-created_date')
+        return Order.objects.filter(event=self.kwargs.get('event_id')).order_by('-created_date').annotate(nb_items=Count('order_items'),total_cmd=Sum('order_items__item__price'))

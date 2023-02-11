@@ -78,11 +78,14 @@ class Order(models.Model):
     is_validated = models.BooleanField('Order Validated',default=False)
     def __str__(self):
         return str(self.pk) + ' - ' + self.event.event_name + ' - ' + _date(self.created_date,'d/m/Y H:i:s')
+    # def nb_items(self):
+    #     items = self.annotate(items_count=models.Count('order_items'))
+    #     return items.items_count
 
 class OrderItem(models.Model):
     # Modele des elements (jeux) des bons de vente
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='item')
     def __str__(self):
         return str(self.order.id) + ' ' + self.item.name
     def itemprice(self):

@@ -2,6 +2,7 @@ from django import forms
 from django.forms.models import inlineformset_factory, BaseInlineFormSet, modelformset_factory
 from django.core.exceptions import ValidationError
 from django.utils.translation import ugettext_lazy as _
+from django.conf import settings
 
 from django.contrib.auth.models import User
 from .models import Item, UserList, Event, Order, OrderItem
@@ -15,11 +16,11 @@ class UserForm(forms.ModelForm):
 
 class ItemForm(forms.ModelForm):
     name = forms.CharField(label='Nom du jeu')
-    price = forms.IntegerField(label='Prix de vente',help_text=_('(Commission de 1€ incluse)'))
+    price = forms.IntegerField(label='Prix de vente',help_text=_('(Commission de 1%s incluse)' % settings.CURRENCY))
     def clean_price(self):
         data = self.cleaned_data['price']
         if data < 1:
-            raise ValidationError(_('Valeur non valide - Entrez un prix supérieur à 1€'), code='invalid')
+            raise ValidationError(_('Valeur non valide - Entrez un prix supérieur à 1%s' % settings.CURRENCY), code='invalid')
         return data
     class Meta:
         model = Item

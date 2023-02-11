@@ -8,6 +8,8 @@
             <th scope="col">#</th>
             <th scope="col">Date de Création</th>
             <th scope="col">Validée</th>
+            <th scope="col"># Jeux</th>
+            <th scope="col">Total Commande</th>
             <th scope="col">Détail</th>
             <th scope="col">Facture</th>
           </tr>
@@ -18,6 +20,8 @@
                 <th scope="row">{{order.pk}}</th>
                 <td>{{ order.created_date }}</td>
                 <td>{% if order.is_validated %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
+                <td>{{ order.nb_items }}</td>
+                <td>{{ order.total_cmd }} {{ SITE_CURRENCY_SETTING }}</td>
                 <td><a href="{% url 'bourse:admin-ordermanage' view.kwargs.event_id order.pk %}">Détail</a></td>
                 <td>{% if order.is_validated %}<a href="{% url 'bourse:admin-order-pre-invoice-form' view.kwargs.event_id order.pk %}">PDF</a>{% endif %}</td>
             </tr>
