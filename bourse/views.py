@@ -97,14 +97,6 @@ class ListDetailByUserDetailView(LoginRequiredMixin,generic.DetailView):
             total_item_price=Sum('list_items__price'),
             total_vente=Sum(Case(When(list_items__is_sold=True, then='list_items__price')) - settings.COMMISSION)
         )
-    # def get_context_data(self, **kwargs):
-    #    context = super().get_context_data(**kwargs)
-    #    context['total_vente_min_com'] = context.userlist.total_vente - context.userlist.nb_sold * settings.COMMISSION
-    #    return context
-    #    user_list_items = Item.objects.filter(list=self.object,is_sold=True)
-    #    context['nb_sold'] = user_list_items.count()
-    #    context['total_vente'] = sum( int(item.price) - settings.COMMISSION for item in user_list_items)
-    #    return context
 
 # Validation de la liste par l'utilisateur (liste de status editable / Bourse en saisie ouverte)
 @login_required
