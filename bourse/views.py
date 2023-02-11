@@ -235,7 +235,8 @@ class ListsListView(UserPassesTestMixin,generic.ListView):
 @login_required
 def ListDetailPdfGen(request,event_id,list_id,var):
     event = get_object_or_404(Event,pk=event_id)
-    user_list = get_object_or_404(UserList,pk=list_id,event=event_id)
+    #user_list = get_object_or_404(UserList,pk=list_id,event=event_id)
+    user_list = UserList.objects.get(pk=list_id,event=event_id)
     user_list_items = Item.objects.filter(list=list_id).order_by('pk')
     filename = 'EVT_' + str(event_id) + '_LST_'+ str(list_id) + '.pdf'
     response = HttpResponse(content_type='application/pdf')
