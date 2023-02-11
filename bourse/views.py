@@ -313,6 +313,7 @@ def OrderDetailValidate(request,event_id,order_id):
     template_name = 'bourse/admin_order_detail.html'
     order = get_object_or_404(Order,pk=order_id,event=event_id)
     order_items = OrderItem.objects.filter(order=order_id)
+    nb_items = order_items.count
     order_total = sum( int(item.item.price) for item in order_items )
     success_url = redirect('bourse:admin-orders',event_id)
     if request.user.is_staff == 1:
@@ -355,7 +356,8 @@ def OrderDetailValidate(request,event_id,order_id):
                 'order':order,
                 'event_id':event_id,
                 'order_items':order_items,
-                'order_total':order_total,}
+                'order_total':order_total,
+                'nb_items':nb_items}
             return render(request,template_name,context)
     else:
         return HttpResponseForbidden()
