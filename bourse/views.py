@@ -312,7 +312,7 @@ def order_create(request, event_id):
 def OrderDetailValidate(request,event_id,order_id):
     template_name = 'bourse/admin_order_detail.html'
     order = get_object_or_404(Order,pk=order_id,event=event_id)
-    order_items = OrderItem.objects.filter(order=order_id)
+    order_items = OrderItem.objects.filter(order=order_id).order_by('add_date')
     nb_items = order_items.count
     order_total = sum( int(item.item.price) for item in order_items )
     success_url = redirect('bourse:admin-orders',event_id)

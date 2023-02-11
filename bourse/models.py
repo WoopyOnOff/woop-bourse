@@ -83,6 +83,7 @@ class OrderItem(models.Model):
     # Modele des elements (jeux) des bons de vente
     order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
     item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='item')
+    add_date = models.DateTimeField('Date Added', auto_now_add=True, null=True)
     def __str__(self):
         return str(self.order.id) + ' ' + self.item.name
     def itemprice(self):
