@@ -187,7 +187,7 @@ def Dashboard(request,event_id):
         user_lists_validated = UserList.objects.filter(event=event_id,list_status=2).count()
         user_lists_editable = UserList.objects.filter(event=event_id,list_status=1).count()
         user_lists_adminvalidated = UserList.objects.filter(event=event_id,list_status=3).count()
-        item_total = Item.objects.filter(list__event=event_id,list__list_status=3).count()
+        item_total = Item.objects.filter(list__event=event_id,list__list_status__in=[3,4]).count()
         item_sold = Item.objects.filter(list__event=event_id,is_sold=True)
         item_sold_total = item_sold.count()
         item_sold_price_total = sum( int(item.price) for item in item_sold )
