@@ -1,10 +1,10 @@
 # Django Imports
 from django.shortcuts import get_object_or_404,render,redirect
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, FileResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
@@ -17,7 +17,7 @@ import datetime, io
 # Other Django imports
 from .models import Event, UserList, Item, Order, OrderItem, Page
 from django.contrib.auth.models import User
-from .forms import UserForm, ItemForm, ListValidateForm, EventForm, OrderModelForm, OrderItemFormset, ItemTextForm, ListManageForm, InvoiceClientForm
+from .forms import UserForm, ItemForm, ListValidateForm, EventForm, OrderModelForm, ItemTextForm, ListManageForm, InvoiceClientForm
 from .printing import MyPrint
 
 #############
@@ -171,6 +171,29 @@ class ItemDelete(LoginRequiredMixin,DeleteView):
             return redirect('bourse:my-list-view',self.kwargs.get('list_id'))
         else:
             return super(ItemDelete, self).post(request, *args, **kwargs)
+
+# Retrouver les invendus pour les ajouter à la liste courrante
+@login_required
+def ListAddUnsoldItems(request,list_id):
+    template_name = 'bourse/list_add_unsold.html'
+    success_url = redirect('bourse:my-list-view',list_id)
+    list_obj = get_object_or_404(UserList,pk=list_id)
+    unsold_from_archived_list = Item.objects.filter(list__user=request.user,list__list_status=4,list__event__status=4,is_sold=False)
+    if request.method == 'POST':
+        if "cancel" in request.POST:
+            return success_url
+        else:
+            checked_list = request.POST.getlist('boxes')
+            print(request.POST)
+            for checked in checked_list:
+                new_price = request.POST.get('price-item-%s' % checked)
+                item_to_copy = unsold_from_archived_list.get(pk=checked)
+                Item.objects.create(list=list_obj,name=item_to_copy.name,price=new_price)
+            messages.success(request, 'Les jeux sélectionnés ont été ajoutés avec succes.')
+            return success_url
+    else:
+        context = { 'unsold_from_archived_list':unsold_from_archived_list }
+        return render(request,template_name,context)
 
 ######################
 ### Administration ###

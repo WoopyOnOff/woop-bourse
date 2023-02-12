@@ -4,9 +4,10 @@
 <h2>Ma liste</h2>
 <h3>{{ userlist.list_label }}</h3>
 {% if userlist.is_editable and userlist.event_status == 1 %}
-<div class="row spacer"><div class="col-3 ">
-    <a href="{% url 'bourse:add-item-to-list' userlist.pk %}"><button class="btn btn-block btn-primary">Ajouter un jeu.</button></a>
-</div></div>
+<div class="row spacer">
+    <div class="col-3 "><a class="btn btn-primary" href="{% url 'bourse:add-item-to-list' userlist.pk %}" role="button">Ajouter un jeu.</a></div>
+    <div class="col-3 "><a class="btn btn-primary" href="{% url 'bourse:add-unsold-to-list' userlist.pk %}" role="button">Retrouver des invendus</a></div>
+</div>
 <p></p>
 {% endif %}
 
