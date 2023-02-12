@@ -65,11 +65,23 @@ class Item(models.Model):
     created_date = models.DateTimeField('Date Created', auto_now_add=True)
     is_sold = models.BooleanField('Item Sold',default=False)
     sold_date = models.DateTimeField('Date Sold',blank=True,null=True)
+    copied_from = models.IntegerField('Copied from',blank=True,null=True,editable=False)
+    copied_to = models.IntegerField('Copied to',blank=True,null=True,editable=False)
     def __str__(self):
         return str(self.pk) + ' - ' + self.name
     def code(self):
         item_code = str(self.pk) + ' - ' + self.name
         return item_code
+    def delete(self):
+        if self.copied_from is not None:
+            source = Item.objects.get(pk=self.copied_from)
+            source.copied_to = None
+            source.save()
+        if self.copied_to is not None:
+            copy = Item.objects.get(pk=self.copied_to)
+            copy.copied_from = None
+            copy.save()
+        super(Item,self).delete()
 
 class Order(models.Model):
     # Modele des bons de vente

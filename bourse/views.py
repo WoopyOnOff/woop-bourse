@@ -177,8 +177,8 @@ class ItemDelete(LoginRequiredMixin,DeleteView):
 def ListAddUnsoldItems(request,list_id):
     template_name = 'bourse/list_add_unsold.html'
     success_url = redirect('bourse:my-list-view',list_id)
-    list_obj = get_object_or_404(UserList,pk=list_id)
-    unsold_from_archived_list = Item.objects.filter(list__user=request.user,list__list_status=4,list__event__status=4,is_sold=False)
+    list_obj = get_object_or_404(UserList,pk=list_id,list_status=1)
+    unsold_from_archived_list = Item.objects.filter(list__user=request.user,list__list_status=4,list__event__status=4,is_sold=False,copied_to=None)
     if request.method == 'POST':
         if "cancel" in request.POST:
             return success_url
@@ -188,7 +188,9 @@ def ListAddUnsoldItems(request,list_id):
             for checked in checked_list:
                 new_price = request.POST.get('price-item-%s' % checked)
                 item_to_copy = unsold_from_archived_list.get(pk=checked)
-                Item.objects.create(list=list_obj,name=item_to_copy.name,price=new_price)
+                new_item = Item.objects.create(list=list_obj,name=item_to_copy.name,price=new_price,copied_from=checked)
+                item_to_copy.copied_to = new_item.pk
+                item_to_copy.save()
             messages.success(request, 'Les jeux sélectionnés ont été ajoutés avec succes.')
             return success_url
     else:
