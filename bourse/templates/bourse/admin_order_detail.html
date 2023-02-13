@@ -5,7 +5,7 @@
 <h2>Commande</h2>
 <h4>ID : {{ order.pk }} - Date de création : {{ order.created_date }}</h4>
 
-{% if not order.is_validated %}
+{% if order.is_editable %}
 <div class="col-6">
 <form action="" method="post">
     {% csrf_token %}
@@ -40,11 +40,12 @@
     </tfoot>
 </table>
 
+
 <form action="" method="post">
     {% csrf_token %}
     {{ form|crispy }}
-    <button type="submit" class="btn btn-primary">Enregistrer</button>
-    <button type="submit" formnovalidate name="cancel" class="btn btn-secondary">Annuler</button>
+    {% if order.is_editable %}<button type="submit" class="btn btn-primary">Enregistrer</button>{% endif %}
+    <button type="submit" formnovalidate name="cancel" class="btn btn-secondary">Annuler</button>   
 </form>
 
 <script>

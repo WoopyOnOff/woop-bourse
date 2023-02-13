@@ -40,6 +40,8 @@
     {% endif %}
     <p>
         <a class="btn btn-primary" href="{% url 'bourse:admin-dashboard' view.kwargs.event_id %}" role="button">Retour Dashboard</a>
+        {% if event_status == 3 %}
         <a class="btn btn-primary" href="{% url 'bourse:admin-ordercreate' view.kwargs.event_id %}" role="button">Créer une Commande</a>
+        {% endif %}
     </p>
 {% endblock %}

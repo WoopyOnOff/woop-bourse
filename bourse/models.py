@@ -90,6 +90,14 @@ class Order(models.Model):
     is_validated = models.BooleanField('Order Validated',default=False)
     def __str__(self):
         return str(self.pk) + ' - ' + self.event.event_name + ' - ' + _date(self.created_date,'d/m/Y H:i:s')
+    # Commande pas éditable si validée, ou pas validé mais que le status de la bourse est différent de 3 (ouverte)
+    def is_editable(self):
+        if self.is_validated: 
+            return False
+        elif not self.is_validated and self.event.status != 3:
+            return False
+        else:
+            return True
 
 class OrderItem(models.Model):
     # Modele des elements (jeux) des bons de vente

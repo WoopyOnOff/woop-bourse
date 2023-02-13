@@ -337,7 +337,6 @@ def OrderDetailValidate(request,event_id,order_id):
     template_name = 'bourse/admin_order_detail.html'
     order = get_object_or_404(Order,pk=order_id,event=event_id)
     order_items = OrderItem.objects.filter(order=order_id).order_by('add_date')
-    nb_items = order_items.count
     order_total = sum( int(item.item.price) for item in order_items )
     success_url = redirect('bourse:admin-orders',event_id)
     if request.user.is_staff == 1:
@@ -381,7 +380,7 @@ def OrderDetailValidate(request,event_id,order_id):
                 'event_id':event_id,
                 'order_items':order_items,
                 'order_total':order_total,
-                'nb_items':nb_items}
+                'nb_items': order_items.count}
             return render(request,template_name,context)
     else:
         return HttpResponseForbidden()
@@ -463,3 +462,8 @@ class OrdersListView(UserPassesTestMixin,generic.ListView):
         return self.request.user.is_staff
     def get_queryset(self):
         return Order.objects.filter(event=self.kwargs.get('event_id')).order_by('-created_date').annotate(nb_items=Count('order_items'),total_cmd=Sum('order_items__item__price'))
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_event = Event.objects.get(pk=self.kwargs.get('event_id'))
+        context['event_status'] = current_event.status
+        return context
