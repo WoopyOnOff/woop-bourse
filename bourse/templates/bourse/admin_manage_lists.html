@@ -30,8 +30,7 @@
       <td>{{ list.user.username }}</td>
       <td>
         {{ list.status_desc }} 
-        {% if list.list_status == 2 or list.list_status == 3 %} (<a href="{% url 'bourse:admin-list-validate' list.event.pk list.pk %}">Modifier</a>)
-        {% endif %}
+        (<a href="{% url 'bourse:admin-list-validate' list.event.pk list.pk %}">{% if list.list_status == 2 or list.list_status == 3 %}Modifier{% else %}Visualiser{% endif %}</a>)
       </td>
       <td align="right">{{ list.nb_items }}</td>
       <td align="right">{{ list.nb_sold }}</td>
