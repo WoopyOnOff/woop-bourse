@@ -4,15 +4,16 @@
 <h2>Ma liste</h2>
 <h3>{{ userlist.list_label }}</h3>
 {% if userlist.is_editable and userlist.event_status == 1 %}
-<div class="row spacer"><div class="col-3 ">
-    <a href="{% url 'bourse:add-item-to-list' userlist.pk %}"><button class="btn btn-block btn-primary">Ajouter un jeu.</button></a>
-</div></div>
+<div class="row spacer">
+    <div class="col-3 "><a class="btn btn-primary" href="{% url 'bourse:add-item-to-list' userlist.pk %}" role="button">Ajouter un jeu.</a></div>
+    <div class="col-3 "><a class="btn btn-primary" href="{% url 'bourse:add-unsold-to-list' userlist.pk %}" role="button">Retrouver des invendus</a></div>
+</div>
 <p></p>
 {% endif %}
 
 <table class="table table-striped">
     <thead class="thead-dark">
-        <tr>
+        <tr align="center">
             <th scope="col">Libellé</th>
             <th scope="col">Prix de vente</th>
             <th scope="col">Jeu vendu ?</th>
@@ -26,19 +27,22 @@
         {% for item in userlist.item_set_sorted %}
         <tr>
             <td>{{item.name}}</td>
-            <td>{{item.price}}</td>
-            <td>{% if item.is_sold %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
+            <td align="right">{{item.price}} {{ SITE_CURRENCY_SETTING }}</td>
+            <td align="center">{% if item.is_sold %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
             <td>{% if item.is_sold %}{{item.sold_date}}{% else %}-{% endif %}</td>
             {% if userlist.is_editable and userlist.event_status == 1 %}
             <td><a href="{% url 'bourse:edit-item-from-list' userlist.pk item.pk %}">Éditer</a> / <a href="{% url 'bourse:del-item-from-list' userlist.pk item.pk %}">Supprimer</a></td>
             {% endif %}
         </tr>
         {% endfor %}
-        {% if userlist.event_status > 1 %}
-            <tr><td colspan="2">Nombre jeux vendus :</td><td>{{nb_sold}}</td><td></td></tr>
-            <tr><td colspan="2">Total commission exclue :</td><td>{{total_vente}}</td><td></td></tr>
-        {% endif %}
     </tbody>
+    <tfoot>
+        <tr align="right"><td>Nombre de jeux :</td><td>{{userlist.nb_items}}</td><td></td><td></td></tr>
+        {% if userlist.event_status > 1 %}
+        <tr align="right"><td>Nombre de jeux vendus :</td><td></td><td>{{userlist.nb_sold}}</td><td></td></tr>
+        <tr align="right"><td>Total commission exclue :</td><td></td><td>{{userlist.total_vente}} {{ SITE_CURRENCY_SETTING }}</td><td></td></tr>
+        {% endif %}
+    </tfoot>
 </table>
 
 {% if userlist.is_editable and userlist.event_status == 1 %}

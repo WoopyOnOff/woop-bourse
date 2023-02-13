@@ -1,31 +1,47 @@
 {% extends "base_generic.html" %}
 {% block content %}
 <h2>Liste des commandes :</h2>
-    {% if order_list %}
+    {% if page_obj %}
     <table class="table table-striped">
         <thead class="thead-dark">
-          <tr>
+          <tr align="center">
             <th scope="col">#</th>
             <th scope="col">Date de Création</th>
             <th scope="col">Validée</th>
+            <th scope="col"># Jeux</th>
+            <th scope="col">Total Commande</th>
             <th scope="col">Détail</th>
             <th scope="col">Facture</th>
           </tr>
         </thead>
         <tbody>
-        {% for order in order_list %}
-            <tr>
-                <th scope="row">{{order.pk}}</th>
+        {% for order in page_obj %}
+            <tr align="center">
+                <th scope="row" align="right">{{order.pk}}</th>
                 <td>{{ order.created_date }}</td>
-                <td>{% if order.is_validated %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
+                <td align="center">{% if order.is_validated %}<img src="/static/img/icon-yes.svg">{% else %}<img src="/static/img/icon-no.svg">{% endif %}</td>
+                <td align="right">{{ order.nb_items }}</td>
+                <td align="right">{{ order.total_cmd }} {{ SITE_CURRENCY_SETTING }}</td>
                 <td><a href="{% url 'bourse:admin-ordermanage' view.kwargs.event_id order.pk %}">Détail</a></td>
                 <td>{% if order.is_validated %}<a href="{% url 'bourse:admin-order-pre-invoice-form' view.kwargs.event_id order.pk %}">PDF</a>{% endif %}</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
+    <nav aria-label="Page navigation">
+        <ul class="pagination justify-content-center">
+            {% for pnum in page_obj.paginator.page_range %}
+            {% if pnum == page_obj.number %}<li class="page-item disabled">{% else %}<li class="page-item">{% endif %}<a class="page-link" href="?page={{ pnum }}">{{ pnum }}</a></li>
+            {% endfor %}
+        </ul>
+    </nav>
     {% else %}
         <p>Il n'y a actuellement aucune commande.</p>
     {% endif %}
-    <a href="{% url 'bourse:admin-dashboard' view.kwargs.event_id %}">Retour Dashboard</a>
+    <p>
+        <a class="btn btn-primary" href="{% url 'bourse:admin-dashboard' view.kwargs.event_id %}" role="button">Retour Dashboard</a>
+        {% if event_status == 3 %}
+        <a class="btn btn-primary" href="{% url 'bourse:admin-ordercreate' view.kwargs.event_id %}" role="button">Créer une Commande</a>
+        {% endif %}
+    </p>
 {% endblock %}

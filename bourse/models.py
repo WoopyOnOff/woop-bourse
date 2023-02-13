@@ -51,7 +51,7 @@ class UserList(models.Model):
         val = self.LIST_STATUSES[( self.list_status - 1 )][1]
         return val
     def item_set_sorted(self):
-        return self.item_set.all().order_by('-created_date')
+        return self.list_items.all().order_by('-created_date')
     def get_absolute_url(self):
         return reverse('bourse:my-list-view',kwargs={"pk": self.id})
     def __str__(self):
@@ -59,17 +59,29 @@ class UserList(models.Model):
 
 class Item(models.Model):
     # Modele des jeux appartenant aux listes
-    list = models.ForeignKey(UserList, on_delete=models.CASCADE)
+    list = models.ForeignKey(UserList, on_delete=models.CASCADE, related_name='list_items')
     name = models.CharField(max_length=100)
     price = models.IntegerField('Sold Price')
     created_date = models.DateTimeField('Date Created', auto_now_add=True)
     is_sold = models.BooleanField('Item Sold',default=False)
     sold_date = models.DateTimeField('Date Sold',blank=True,null=True)
+    copied_from = models.IntegerField('Copied from',blank=True,null=True,editable=False)
+    copied_to = models.IntegerField('Copied to',blank=True,null=True,editable=False)
     def __str__(self):
         return str(self.pk) + ' - ' + self.name
     def code(self):
         item_code = str(self.pk) + ' - ' + self.name
         return item_code
+    def delete(self):
+        if self.copied_from is not None:
+            source = Item.objects.get(pk=self.copied_from)
+            source.copied_to = None
+            source.save()
+        if self.copied_to is not None:
+            copy = Item.objects.get(pk=self.copied_to)
+            copy.copied_from = None
+            copy.save()
+        super(Item,self).delete()
 
 class Order(models.Model):
     # Modele des bons de vente
@@ -78,11 +90,20 @@ class Order(models.Model):
     is_validated = models.BooleanField('Order Validated',default=False)
     def __str__(self):
         return str(self.pk) + ' - ' + self.event.event_name + ' - ' + _date(self.created_date,'d/m/Y H:i:s')
+    # Commande pas éditable si validée, ou pas validé mais que le status de la bourse est différent de 3 (ouverte)
+    def is_editable(self):
+        if self.is_validated: 
+            return False
+        elif not self.is_validated and self.event.status != 3:
+            return False
+        else:
+            return True
 
 class OrderItem(models.Model):
     # Modele des elements (jeux) des bons de vente
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
-    item = models.ForeignKey(Item, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE, related_name='order_items')
+    item = models.ForeignKey(Item, on_delete=models.CASCADE, related_name='item')
+    add_date = models.DateTimeField('Date Added', auto_now_add=True, null=True)
     def __str__(self):
         return str(self.order.id) + ' ' + self.item.name
     def itemprice(self):

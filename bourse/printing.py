@@ -57,6 +57,7 @@ class MyPrint:
         self.c.setTitle('Fiche Inscription Bourse Woopy')
         event_desc = event.event_name + ' du ' + event.date_only()
         user_full_name_desc = 'Vendeur n°' + str(user_list.user.id) + ' - ' + user_list.user.first_name + ' ' + user_list.user.last_name
+        total_nb_items_desc = 'Nombre de jeux déposés : %s' % user_list_items.count()
         if post:
             my_black = colors.white
             my_grey = colors.white
@@ -72,6 +73,7 @@ class MyPrint:
 
         title = Paragraph(event_desc, my_heading1)
         seller = Paragraph(user_full_name_desc, my_heading2)
+        items_tot = Paragraph(total_nb_items_desc, my_bodytext)
 
         table_data = []
         price_tags_data = []
@@ -89,6 +91,8 @@ class MyPrint:
                 title.drawOn(self.c, *self.coord(2,2,cm))
                 seller.wrapOn(self.c, 17*cm, 1*cm)
                 seller.drawOn(self.c, *self.coord(2,3,cm))
+                items_tot.wrapOn(self.c, 17*cm, 1*cm)
+                items_tot.drawOn(self.c, *self.coord(2,3.5,cm))
                 # Vertical line
                 if not post:
                     self.c.setLineWidth(0.5)

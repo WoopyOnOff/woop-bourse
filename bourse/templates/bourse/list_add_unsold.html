@@ -1,0 +1,35 @@
+{% extends "base_generic.html" %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+<h2>Mes invendus des bourses précédentes</h2>
+  <form action="" method="post">
+    {% csrf_token %}
+    <table class="table table-striped">
+      <thead class="thead-dark">
+          <tr>
+              <th scope="col">Choisir</th>
+              <th scope="col">Nom du jeu</th>
+              <th scope="col">Ancien Prix</th>
+              <th scope="col">Nouveau Prix</th>
+          </tr>
+      </thead>
+      <tbody>
+        {% if unsold_from_archived_list %}
+          {% for item in unsold_from_archived_list %}
+            <tr>
+              <td><div class="form-check"><input class="form-check-input" type="checkbox" value="{{ item.pk }}" name="boxes"></div></td>
+              <td>{{ item.name }}</td>
+              <td align="right">{{ item.price }} {{ SITE_CURRENCY_SETTING }}</td>
+              <td><div class="form-check"><input class="form-text-input" type="number" min="1" id="id_price-item-{{ item.pk }}" name="price-item-{{ item.pk }}"></div></td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="4">Vous n'avez aucun invendu des bourses précédentes.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Valider</button>
+    <button type="submit" name="cancel" class="btn btn-primary">Annuler</button>
+  </form>
+{% endblock %}

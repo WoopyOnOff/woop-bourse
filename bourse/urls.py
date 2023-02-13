@@ -33,6 +33,8 @@ urlpatterns = [
     path('mylist/<int:list_id>/item/<int:pk>/delete/',views.ItemDelete.as_view(),name='del-item-from-list'),
     # Mise à jour d'un élément de la liste
     path('mylist/<int:list_id>/item/<int:pk>/update/',views.ItemUpdate.as_view(),name='edit-item-from-list'),
+    # Retrouver les invendus pour les ajouter à la liste courrante
+    path('mylist/<int:list_id>/addunsoldform',views.ListAddUnsoldItems,name='add-unsold-to-list'),
 
     ### Administration
     # Dashboard de l'événement

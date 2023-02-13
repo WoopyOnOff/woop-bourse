@@ -1,22 +1,23 @@
 # Django Imports
 from django.shortcuts import get_object_or_404,render,redirect
-from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden, FileResponse
+from django.http import HttpResponseRedirect, HttpResponse, HttpResponseForbidden
 from django.urls import reverse, reverse_lazy
 from django.views import generic
 from django.views.generic.edit import CreateView, UpdateView, DeleteView
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin, UserPassesTestMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.decorators import login_required
 from django.utils.translation import ugettext_lazy as _
 from django.conf import settings
 from django.contrib.messages.views import SuccessMessageMixin
 from django.contrib import messages
+from django.db.models import Count, Sum, Case, When, IntegerField
 
 # Sys
 import datetime, io
 # Other Django imports
 from .models import Event, UserList, Item, Order, OrderItem, Page
 from django.contrib.auth.models import User
-from .forms import UserForm, ItemForm, ListValidateForm, EventForm, OrderModelForm, OrderItemFormset, ItemTextForm, ListManageForm, InvoiceClientForm
+from .forms import UserForm, ItemForm, ListValidateForm, EventForm, OrderModelForm, ItemTextForm, ListManageForm, InvoiceClientForm
 from .printing import MyPrint
 
 #############
@@ -90,13 +91,11 @@ class ListDetailByUserDetailView(LoginRequiredMixin,generic.DetailView):
     model = UserList
     template_name = 'bourse/list_detail_by_user.html'
     def get_queryset(self):
-        return UserList.objects.filter(user=self.request.user).order_by('created_date')
-    def get_context_data(self, **kwargs):
-       context = super().get_context_data(**kwargs)
-       user_list_items = Item.objects.filter(list=self.object,is_sold=True)
-       context['nb_sold'] = user_list_items.count()
-       context['total_vente'] = sum( int(item.price) - settings.COMMISSION for item in user_list_items)
-       return context
+        return UserList.objects.filter(user=self.request.user).order_by('created_date').annotate(
+            nb_items=Count('list_items', distinct=True),
+            nb_sold=Count(Case(When(list_items__is_sold=True, then=1),output_field=IntegerField())),
+            total_vente=Sum(Case(When(list_items__is_sold=True, then='list_items__price')) - settings.COMMISSION)
+        )
 
 # Validation de la liste par l'utilisateur (liste de status editable / Bourse en saisie ouverte)
 @login_required
@@ -136,7 +135,7 @@ class ItemCreate(LoginRequiredMixin,CreateView):
         self.object.list_id = self.kwargs.get('list_id', None)
         if UserList.objects.filter(user=self.request.user,id=self.object.list_id,list_status=1,event__status=1):
             self.object.save()
-            messages.success(self.request, _('Jeu %s correctement ajouté.' % self.object.name))
+            messages.success(self.request, _('Jeu « %s » correctement ajouté.' % self.object.name))
             return redirect('bourse:my-list-view',self.object.list_id)
         else:
             return HttpResponseForbidden()
@@ -153,7 +152,7 @@ class ItemUpdate(LoginRequiredMixin,UpdateView):
         self.object.list_id = self.kwargs.get('list_id', None)
         if UserList.objects.filter(user=self.request.user,id=self.object.list_id,list_status=1,event__status=1):
             self.object.save()
-            messages.success(self.request, _('Jeu %s mis à jour.' % self.object.name))
+            messages.success(self.request, _('Jeu « %s » mis à jour.' % self.object.name))
             return redirect('bourse:my-list-view',self.object.list_id)
         else:
             return HttpResponseForbidden()
@@ -164,7 +163,7 @@ class ItemDelete(LoginRequiredMixin,DeleteView):
     def get_queryset(self):
         return Item.objects.filter(id=self.kwargs.get('pk'),list__user=self.request.user,list__list_status=1,list__event__status=1)
     def get_success_url(self):
-        messages.success(self.request, _('Le jeu %s est supprimé.' % self.object.name))
+        messages.success(self.request, _('Le jeu « %s » est supprimé.' % self.object.name))
         return reverse_lazy('bourse:my-list-view',kwargs={'pk':self.kwargs.get('list_id')})
     def post(self, request, *args, **kwargs):
         if "cancel" in request.POST:
@@ -172,6 +171,31 @@ class ItemDelete(LoginRequiredMixin,DeleteView):
             return redirect('bourse:my-list-view',self.kwargs.get('list_id'))
         else:
             return super(ItemDelete, self).post(request, *args, **kwargs)
+
+# Retrouver les invendus pour les ajouter à la liste courrante
+@login_required
+def ListAddUnsoldItems(request,list_id):
+    template_name = 'bourse/list_add_unsold.html'
+    success_url = redirect('bourse:my-list-view',list_id)
+    list_obj = get_object_or_404(UserList,pk=list_id,list_status=1)
+    unsold_from_archived_list = Item.objects.filter(list__user=request.user,list__list_status=4,list__event__status=4,is_sold=False,copied_to=None)
+    if request.method == 'POST':
+        if "cancel" in request.POST:
+            return success_url
+        else:
+            checked_list = request.POST.getlist('boxes')
+            print(request.POST)
+            for checked in checked_list:
+                new_price = request.POST.get('price-item-%s' % checked)
+                item_to_copy = unsold_from_archived_list.get(pk=checked)
+                new_item = Item.objects.create(list=list_obj,name=item_to_copy.name,price=new_price,copied_from=checked)
+                item_to_copy.copied_to = new_item.pk
+                item_to_copy.save()
+            messages.success(request, 'Les jeux sélectionnés ont été ajoutés avec succes.')
+            return success_url
+    else:
+        context = { 'unsold_from_archived_list':unsold_from_archived_list }
+        return render(request,template_name,context)
 
 ######################
 ### Administration ###
@@ -186,7 +210,7 @@ def Dashboard(request,event_id):
         user_lists_validated = UserList.objects.filter(event=event_id,list_status=2).count()
         user_lists_editable = UserList.objects.filter(event=event_id,list_status=1).count()
         user_lists_adminvalidated = UserList.objects.filter(event=event_id,list_status=3).count()
-        item_total = Item.objects.filter(list__event=event_id,list__list_status=3).count()
+        item_total = Item.objects.filter(list__event=event_id,list__list_status__in=[3,4]).count()
         item_sold = Item.objects.filter(list__event=event_id,is_sold=True)
         item_sold_total = item_sold.count()
         item_sold_price_total = sum( int(item.price) for item in item_sold )
@@ -230,13 +254,14 @@ class ListsListView(UserPassesTestMixin,generic.ListView):
     def test_func(self):
         return self.request.user.is_staff
     def get_queryset(self):
-        return UserList.objects.filter(event=self.kwargs.get('pk')).order_by('validated_date')
+        return UserList.objects.filter(event=self.kwargs.get('pk')).order_by('validated_date').annotate(nb_items=Count('list_items', distinct=True), nb_sold=Count(Case(When(list_items__is_sold=True, then=1),output_field=IntegerField())))
 
 # Generation de PDF de la liste de l'utilisateur
 @login_required
 def ListDetailPdfGen(request,event_id,list_id,var):
     event = get_object_or_404(Event,pk=event_id)
-    user_list = get_object_or_404(UserList,pk=list_id,event=event_id)
+    #user_list = get_object_or_404(UserList,pk=list_id,event=event_id)
+    user_list = UserList.objects.get(pk=list_id,event=event_id)
     user_list_items = Item.objects.filter(list=list_id).order_by('pk')
     filename = 'EVT_' + str(event_id) + '_LST_'+ str(list_id) + '.pdf'
     response = HttpResponse(content_type='application/pdf')
@@ -311,7 +336,7 @@ def order_create(request, event_id):
 def OrderDetailValidate(request,event_id,order_id):
     template_name = 'bourse/admin_order_detail.html'
     order = get_object_or_404(Order,pk=order_id,event=event_id)
-    order_items = OrderItem.objects.filter(order=order_id)
+    order_items = OrderItem.objects.filter(order=order_id).order_by('add_date')
     order_total = sum( int(item.item.price) for item in order_items )
     success_url = redirect('bourse:admin-orders',event_id)
     if request.user.is_staff == 1:
@@ -325,11 +350,11 @@ def OrderDetailValidate(request,event_id,order_id):
                     if Item.objects.filter(pk=order_item_pk,list__list_status=3,is_sold=False,list__event=event_id).exists():
                         item = Item.objects.get(pk=order_item_pk)
                         OrderItem.objects.create(order=order,item=item)
-                    messages.success(request, 'Le jeu est ajouté.')
-                    return HttpResponseRedirect("")
+                    messages.success(request, 'Le jeu « %s » est ajouté.' % item.name)
+                    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
                 else:
                     messages.error(request, 'Problème à l\'ajout du jeu.')
-                    return HttpResponseRedirect("")
+                    return HttpResponseRedirect(request.META.get('HTTP_REFERER'))
             else:
                 form = OrderModelForm(request.POST)
                 if form.is_valid():
@@ -354,7 +379,8 @@ def OrderDetailValidate(request,event_id,order_id):
                 'order':order,
                 'event_id':event_id,
                 'order_items':order_items,
-                'order_total':order_total,}
+                'order_total':order_total,
+                'nb_items': order_items.count}
             return render(request,template_name,context)
     else:
         return HttpResponseForbidden()
@@ -383,7 +409,6 @@ def OrderPreInvoicePdfGen(request,event_id,order_id):
     order = get_object_or_404(Order,pk=order_id,event=event_id)
     order_items = OrderItem.objects.filter(order=order_id)
     cancel_url = redirect('bourse:admin-orders',event_id)
-    #success_url = redirect('admin-order-invoice-pdf',event_id,order_id)
     filename = 'EVT_' + str(event_id) + '_INVOICE_'+ str(order_id) + '.pdf'
     response = HttpResponse(content_type='application/pdf')
     response['Content-Disposition'] = 'attachment; filename=' + filename
@@ -399,8 +424,6 @@ def OrderPreInvoicePdfGen(request,event_id,order_id):
                     pdf = report.createInvoice(event,order,order_items,form.cleaned_data)
                     response.write(pdf)
                     return response
-                    ##OrderDetailPdfGen(request,event_id,order_id,self.data) # TO DO
-                    ##return HttpResponseRedirect(reverse_lazy('admin-order-invoice-pdf',kwargs={'event_id':event_id,'order_id':order_id}))
         else:
             form = InvoiceClientForm()
             context = { 
@@ -438,4 +461,9 @@ class OrdersListView(UserPassesTestMixin,generic.ListView):
     def test_func(self):
         return self.request.user.is_staff
     def get_queryset(self):
-        return Order.objects.filter(event=self.kwargs.get('event_id')).order_by('-created_date')
+        return Order.objects.filter(event=self.kwargs.get('event_id')).order_by('-created_date').annotate(nb_items=Count('order_items'),total_cmd=Sum('order_items__item__price'))
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        current_event = Event.objects.get(pk=self.kwargs.get('event_id'))
+        context['event_status'] = current_event.status
+        return context
