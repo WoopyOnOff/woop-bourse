@@ -457,7 +457,7 @@ def OrderDetailPdfGen(request,event_id,order_id,*args):
 class OrdersListView(UserPassesTestMixin,generic.ListView):
     model = Order
     template_name = 'bourse/admin_orders_list.html'
-    paginate_by = 5
+    paginate_by = 20
     def test_func(self):
         return self.request.user.is_staff
     def get_queryset(self):
